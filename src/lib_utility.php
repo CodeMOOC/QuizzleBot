@@ -19,12 +19,28 @@ function starts_with($text = '', $substring = '') {
 }
 
 /**
+ * Extracts the first command from a given text string.
+ */
+function extract_command($text = '') {
+    $matches = array();
+    if(preg_match("/^\/([a-zA-Z0-9_]*)( |$)/", $text, $matches) !== 1) {
+        return null;
+    }
+
+    if(sizeof($matches) < 2) {
+        return null;
+    }
+
+    return $matches[1];
+}
+
+/**
  * Extracts the command payload from a string.
  * @param $text String to search in.
  * @return string Command payload, if any, or empty string.
  */
 function extract_command_payload($text = '') {
-    return mb_ereg_replace("^\/[a-zA-Z0-9_]*( |$)", '', $text);
+    return mb_ereg_replace("/^\/([a-zA-Z0-9_]*)( |$)/", '', $text);
 }
 
 /**
