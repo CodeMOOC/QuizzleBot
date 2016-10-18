@@ -7,7 +7,7 @@
  * Basic message processing webhook end-point for your bot.
  */
 
-require_once('log.php');
+
 require_once('lib.php');
 
 // Get input contents

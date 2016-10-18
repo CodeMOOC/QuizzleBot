@@ -4,13 +4,13 @@
  * ===================
  * UWiClab, University of Urbino
  * ===================
- * Database support library. Don't change a thing here.
+ * Database base support library. Don't change a thing here.
  */
 
  function db_default_error_logging($connection, $message = "Database error") {
     $errno = mysqli_errno($connection);
     $error = mysqli_error($connection);
-    Logger::warning("$message #$errno: $error", __FILE__);
+    echo '(DB) ' . "$message #$errno: $error". PHP_EOL;
  }
 
 /**
@@ -242,5 +242,48 @@ function db_row_query($sql) {
 function db_escape($s) {
     return mysqli_real_escape_string(db_open_connection(true), (string)$s);
 }
+
+const RIDDLE_ID             = 0;
+const RIDDLE_START_TIME     = 1;
+const RIDDLE_ANSWER         = 2;
+const RIDDLE_ENS_TIME       = 3;
+
+const RIDDLE             = array(
+    RIDDLE_ID,
+    RIDDLE_START_TIME,
+    RIDDLE_ANSWER,
+    RIDDLE_ENS_TIME
+);
+
+const ANSWER_ID             = 0;
+const ANSWER_RIDDLE_ID      = 1;
+const ANSWER_IDENTITY_ID    = 2;
+const ANSWER_TEXT           = 3;
+const ANSWER_LAST_UPDATE    = 4;
+
+const ANSWER             = array(
+    ANSWER_ID,
+    ANSWER_RIDDLE_ID,
+    ANSWER_IDENTITY_ID,
+    ANSWER_TEXT,
+    ANSWER_LAST_UPDATE
+);
+
+const IDENTITY_ID             = 0;
+const IDENTITY_TELEGRAM_ID    = 1;
+const IDENTITY_FIRST_NAME     = 2;
+const IDENTITY_FULL_NAME      = 3;
+const IDENTITY_FIRST_SEEN_ON  = 4;
+const IDENTITY_IS_ADMIN       = 5;
+
+
+const IDENTITY             = array(
+    IDENTITY_ID,
+    IDENTITY_TELEGRAM_ID,
+    IDENTITY_FIRST_NAME,
+    IDENTITY_FULL_NAME,
+    IDENTITY_FIRST_SEEN_ON,
+    IDENTITY_IS_ADMIN
+);
 
 ?>

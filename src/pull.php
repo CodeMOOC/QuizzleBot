@@ -7,7 +7,7 @@
  * Basic message processing in pull mode for your bot.
  */
 
-require_once('log.php');
+
 require_once('lib.php');
 
 // Reload latest update ID received (if any) from persistent store
