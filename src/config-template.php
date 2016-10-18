@@ -29,5 +29,7 @@ define('DATABASE_PASSWORD', '');
 
 /* Settings constant */
 define('ADMIN_TELEGRAM_ID', 0);
+define('DEBUG_TO_DB', false);
+define('DEBUG_TO_BOT', false);
 
 ?>
