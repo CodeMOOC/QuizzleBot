@@ -94,7 +94,7 @@ function is_answer_correct($telegram_id, $riddle_id) {
 }
 
 /**
- * Removes an answer
+ * Removes all answers to a riddle.
  *
  * @param $telegram_id
  * @param $riddle_id
@@ -105,21 +105,19 @@ function delete_already_answered($telegram_id, $riddle_id) {
 }
 
 /**
- * Inserts new answer (removing old answer to the same question, if needed).
- * Automatically select the last open riddle.
- *
- * @param $telegram_id Int telegram id
- * @param $text String the answer
- * @return bool
- * @throws ErrorException If there is no open riddle.
+ * Inserts answer to a riddle.
+ * @param $telegram_id Telegram ID of the user.
+ * @param $text Answer to register.
+ * @param $riddle_id ID of the riddle. Null default to last open riddle,. if any.
+ * @return bool True on success. False otherwise.
  */
-function insert_answer($telegram_id, $text) {
-    $last_open_riddle_id = get_last_open_riddle_id();
+function insert_answer($telegram_id, $text, $riddle_id = null) {
+    if($riddle_id === null) {
+        $riddle_id = get_last_open_riddle_id();
+    }
 
-    delete_already_answered($telegram_id, $last_open_riddle_id);
-
-    if($last_open_riddle_id) {
-        return db_perform_action("INSERT INTO `answer` (`riddle_id`, `telegram_id`, `text`) VALUES ('$last_open_riddle_id', '$telegram_id', '$text')");
+    if($riddle_id) {
+        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}', '" . db_escape($text) . "', DEFAULT)") === 1;
     }
 
     throw new ErrorException('No open riddles');
