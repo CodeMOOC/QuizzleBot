@@ -70,14 +70,13 @@ class Context {
     function reply($message, $additional_values = null) {
         $hydration_values = array(
             '%FIRST_NAME%' => $this->get_message()->get_sender_first_name(),
-            '%FULL_NAME%' => $this->get_message()->get_sender_full_name(),
-            '%GROUP_NAME%' => $this->get_group_name()
+            '%FULL_NAME%' => $this->get_message()->get_sender_full_name()
         );
 
         $hydrated = hydrate($message, unite_arrays($hydration_values, $additional_values));
 
         return telegram_send_message(
-            $this->get_chat_id(),
+            $this->get_telegram_chat_id(),
             $hydrated,
             array(
                 'parse_mode' => 'HTML',
