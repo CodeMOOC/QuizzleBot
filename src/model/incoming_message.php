@@ -77,19 +77,6 @@ class IncomingMessage {
         return 'group' === $this->payload['chat']['type'];
     }
 
-    function get_photo_small_id() {
-        if(isset($this->payload[self::TELEGRAM_PHOTO])) {
-            return $this->payload[self::TELEGRAM_PHOTO][1][self::TELEGRAM_FILEID];
-        }
-    }
-
-    function get_photo_large_id() {
-        if(isset($this->payload[self::TELEGRAM_PHOTO])) {
-            $photo = $this->payload[self::TELEGRAM_PHOTO];
-            return $photo[sizeof($photo)-1][self::TELEGRAM_FILEID];
-        }
-    }
-
     /**
      * Gets the sender's first name.
      */
