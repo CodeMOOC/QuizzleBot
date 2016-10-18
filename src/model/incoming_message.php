@@ -91,9 +91,16 @@ class IncomingMessage {
     }
 
     /**
-     * Gets the full sender name (combination of all available names).
+     * Gets the sender's first name.
      */
-    function get_full_sender_name() {
+    function get_sender_first_name() {
+        return $this->payload['from']['first_name'];
+    }
+
+    /**
+     * Gets the sender's full name (combination of all available names).
+     */
+    function get_sender_full_name() {
         $parts = array(
             $this->payload['from']['first_name'],
             $this->payload['from']['last_name']

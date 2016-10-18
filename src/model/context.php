@@ -15,14 +15,6 @@ class Context {
 
     private $message;
 
-    private $is_admin = false;
-
-    private $group_id = null;
-    private $group_name = null;
-    private $group_state = null;
-    private $group_track_id = null;
-    private $group_track_index = 0;
-
     /**
      * Construct Context class.
      * @param §message IncomingMessage.
@@ -36,23 +28,27 @@ class Context {
     }
 
     /* True if the talking user is an admin */
-    function is_admin() {
-        return $this->is_admin;
+    function is_abmin() {
+        return $this->message->from_id === ADMIN_TELEGRAM_ID;
     }
 
-    /* The running game ID */
-    function get_game_id() {
-        return CURRENT_GAME_ID;
-    }
-
-    function get_user_id() {
+    /**
+     * Gets the user's Telegram ID.
+     */
+    function get_telegram_user_id() {
         return $this->message->from_id;
     }
 
-    function get_chat_id() {
+    /**
+     * Gets the user's chat ID.
+     */
+    function get_telegram_chat_id() {
         return $this->message->chat_id;
     }
 
+    /**
+     * Gets the raw message.
+     */
     function get_message() {
         return $this->message;
     }
@@ -68,36 +64,14 @@ class Context {
             return '';
     }
 
-    function get_group_id() {
-        return $this->group_id;
-    }
-
-    function get_group_name() {
-        return $this->group_name;
-    }
-
-    function get_group_state() {
-        return $this->group_state;
-    }
-
-    function get_track_id() {
-        return $this->group_track_id;
-    }
-
-    function get_track_index() {
-        if($this->group_track_id === null)
-            return null;
-        else
-            return $this->group_track_index;
-    }
-
     /**
      * Replies to the current incoming message.
      * Enables markdown parsing and disables web previews by default.
      */
     function reply($message, $additional_values = null) {
         $hydration_values = array(
-            '%FULL_NAME%' => $this->get_message()->get_full_sender_name(),
+            '%FIRST_NAME%' => $this->get_message()->get_sender_first_name(),
+            '%FULL_NAME%' => $this->get_message()->get_sender_full_name(),
             '%GROUP_NAME%' => $this->get_group_name()
         );
 
@@ -107,28 +81,7 @@ class Context {
             $this->get_chat_id(),
             $hydrated,
             array(
-                'parse_mode' => 'Markdown',
-                'disable_web_page_preview' => true
-            )
-        );
-    }
-
-    /**
-     * Sends out a message on the channel.
-     */
-    function channel($message, $additional_values = null) {
-        $hydration_values = array(
-            '%FULL_NAME%' => $this->get_message()->get_full_sender_name(),
-            '%GROUP_NAME%' => $this->get_group_name()
-        );
-
-        $hydrated = hydrate($message, unite_arrays($hydration_values, $additional_values));
-
-        return telegram_send_message(
-            CHAT_CHANNEL,
-            $hydrated,
-            array(
-                'parse_mode' => 'Markdown',
+                'parse_mode' => 'HTML',
                 'disable_web_page_preview' => true
             )
         );
