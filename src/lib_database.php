@@ -11,64 +11,121 @@ require_once ('lib_core_database.php');
 
 
 //RIDDLES
+/**
+ * Returns a specific riddle as an array.
+ *
+ * @param $riddle_id
+ * @return mixed
+ */
 function get_riddle($riddle_id) {
     return db_row_query("SELECT * FROM `riddle` WHERE `id` = $riddle_id");
 }
 
+/**
+ * Open a new riddle returning the new riddle Id.
+ *
+ * @return Int the mew riddle Id
+ */
 function open_riddle() {
     return db_perform_action("INSERT INTO `riddle` VALUES ()");
 }
 
+/**
+ * Close a riddle.
+ *
+ * @param $riddle_id Int the riddle id
+ * @param $text String the answer.
+ * @return bool
+ */
 function close_riddle($riddle_id, $text) {
-    return db_perform_action("UPDATE `riddle` SET `answer` = '$text', `end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
+    return db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
 }
 
+/**
+ * Returns the id of the last open riddles (if there is one).
+ *
+ * @return Int
+ */
 function get_last_open_riddle_id() {
     return db_scalar_query("SELECT id FROM `riddle` WHERE end_time IS NULL ORDER BY `start_time` DESC LIMIT 1");
 }
 
+/**
+ * Checks whether a riddle is open or not, returning 0 or 1.
+ *
+ * @param $riddle_id
+ * @return int Returns 0 or 1.
+ */
 function is_riddle_closed($riddle_id) {
     return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = $riddle_id");
 }
 
-//IDENTITIES
-function get_identity($identity_id) {
-    return db_row_query("SELECT * FROM `identity` WHERE `id` = $identity_id");
-}
-
-function insert_identity($telegram_id, $first_name, $full_name = "") {
-    return db_perform_action("INSERT INTO `indentity` (`telegram_id`, `first_name`, `full_name`) VALUES ('$telegram_id', '$first_name', '$full_name')");
-}
-
-
 //ANSWERS
-function get_answer($answer_id) {
-    return  db_row_query("SELECT * FROM `answer` WHERE `id` = $answer_id");
+
+/**
+ * Returns a specific answer identified by $telegram_id, $riddle_id, as an array.
+ *
+ * @param $user_id
+ * @param $riddle_id
+ * @return mixed
+ */
+function get_answer($telegram_id, $riddle_id) {
+    return  db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = $telegram_id AND `riddle_id` = $riddle_id ORDER BY answer.last_update DESC" );
 }
 
-function is_answer_correct($answer_id) {
-    $answer_row = get_answer($answer_id);
-    echo "#".print_r($answer_row, true)."#".PHP_EOL;
-    echo "## ".$answer_row[ANSWER[ANSWER_RIDDLE_ID]].PHP_EOL;
+/**
+ * Checks whether the answer (identified by $telegram_id, $riddle_id) is correct.
+ *
+ * @param $user_id
+ * @param $riddle_id
+ * @return bool
+ * @throws ErrorException
+ */
+function is_answer_correct($telegram_id, $riddle_id) {
+    $answer_row = get_answer($telegram_id, $riddle_id);
 
-    if(is_riddle_closed(trim($answer_row[ANSWER[ANSWER_RIDDLE_ID]])) != 1){
+    if(is_riddle_closed($answer_row[ANSWER[ANSWER_RIDDLE_ID]]) != 1){
         throw new ErrorException('Riddle still open');
     }
 
     $riddle_row = get_riddle($answer_row[ANSWER[ANSWER_RIDDLE_ID]]);
 
     return strcasecmp (trim($riddle_row[RIDDLE[RIDDLE_ANSWER]]), trim($answer_row[ANSWER[ANSWER_TEXT]])) == 0;
-
 }
 
-function insert_answer($user_id, $text) {
+/**
+ * Removes an answer
+ *
+ * @param $telegram_id
+ * @param $riddle_id
+ * @return bool|int
+ */
+function delete_already_answered($telegram_id, $riddle_id) {
+    return db_perform_action("DELETE FROM `answer` WHERE riddle_id = $riddle_id AND telegram_id = $telegram_id");
+}
+
+/**
+ * Inserts new answer (removing old answer to the same question, if needed).
+ * Automatically select the last open riddle.
+ *
+ * @param $telegram_id Int telegram id
+ * @param $text String the answer
+ * @return bool
+ * @throws ErrorException If there is no open riddle.
+ */
+function insert_answer($telegram_id, $text) {
     $last_open_riddle_id = get_last_open_riddle_id();
-    if($last_open_riddle_id)
-        return db_perform_action("INSERT INTO `answer` (`riddle_id`, `identity_id`, `text`) VALUES ('$last_open_riddle_id', '$user_id', '$text')");
+
+    delete_already_answered($telegram_id, $last_open_riddle_id);
+
+    if($last_open_riddle_id) {
+        return db_perform_action("INSERT INTO `answer` (`riddle_id`, `telegram_id`, `text`) VALUES ('$last_open_riddle_id', '$telegram_id', '$text')");
+    }
 
     throw new ErrorException('No open riddles');
 }
 
-function check_answer($answer_id) {
-
+//USERS
+function user_stats($telegram_id) {
+ //TODO: what stats?
 }
