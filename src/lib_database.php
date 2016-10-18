@@ -23,22 +23,22 @@ function get_riddle($riddle_id) {
 
 /**
  * Open a new riddle returning the new riddle Id.
- *
- * @return Int the mew riddle Id
+ * @return Int New riddle ID.
  */
 function open_riddle() {
-    return db_perform_action("INSERT INTO `riddle` VALUES ()");
+    return db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL)");
 }
 
 /**
  * Close a riddle.
  *
- * @param $riddle_id Int the riddle id
- * @param $text String the answer.
- * @return bool
+ * @param $riddle_id Riddle ID.
+ * @param $text Answer string.
+ * @return bool True on success.
  */
 function close_riddle($riddle_id, $text) {
-    return db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
+    $clean_text = db_escape(extract_response($text));
+    return db_perform_action("UPDATE `riddle` SET `answer` = '{$clean_text}', `end_time` = CURRENT_TIMESTAMP WHERE `id` = $riddle_id") === 1;
 }
 
 /**
@@ -108,7 +108,7 @@ function delete_already_answered($telegram_id, $riddle_id) {
  * Inserts answer to a riddle.
  * @param $telegram_id Telegram ID of the user.
  * @param $text Answer to register.
- * @param $riddle_id ID of the riddle. Null default to last open riddle,. if any.
+ * @param $riddle_id ID of the riddle. Null defaults to last open riddle,. if any.
  * @return bool True on success. False otherwise.
  */
 function insert_answer($telegram_id, $text, $riddle_id = null) {
@@ -117,7 +117,8 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
     }
 
     if($riddle_id) {
-        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}', '" . db_escape($text) . "', DEFAULT)") === 1;
+        $clean_text = db_escape(extract_response($text));
+        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}', '{$clean_text}', DEFAULT)") === 1;
     }
 
     throw new ErrorException('No open riddles');
@@ -125,5 +126,5 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 
 //USERS
 function user_stats($telegram_id) {
- //TODO: what stats?
+    // TODO: what stats?
 }
