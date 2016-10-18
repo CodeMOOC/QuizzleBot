@@ -30,15 +30,26 @@ function open_riddle() {
 }
 
 /**
- * Close a riddle.
+ * Closes a riddle then returns ordered riddle stats (telegram_id, success).
  *
  * @param $riddle_id Riddle ID.
  * @param $text Answer string.
  * @return bool True on success.
  */
 function close_riddle($riddle_id, $text) {
+
+    if(is_riddle_closed($riddle_id) == 1){
+        throw new ErrorException('Riddle already closed');
+    }
+
     $clean_text = db_escape(extract_response($text));
-    return db_perform_action("UPDATE `riddle` SET `answer` = '{$clean_text}', `end_time` = CURRENT_TIMESTAMP WHERE `id` = $riddle_id") === 1;
+
+    db_perform_action("START TRANSACTION;");
+    db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$clean_text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
+    $stats = db_table_query("SELECT answer.telegram_id as telegram_id, riddle.answer = answer.text as success FROM `answer` LEFT JOIN riddle ON answer.riddle_id = riddle.id WHERE riddle.id = $riddle_id order by riddle.answer = answer.text DESC, answer.last_update DESC;");
+    db_perform_action("COMMIT");
+
+    return $stats;
 }
 
 /**
@@ -124,7 +135,3 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
     throw new ErrorException('No open riddles');
 }
 
-//USERS
-function user_stats($telegram_id) {
-    // TODO: what stats?
-}
