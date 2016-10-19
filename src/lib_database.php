@@ -34,7 +34,7 @@ function open_riddle() {
  *
  * @param $riddle_id Riddle ID.
  * @param $text Answer string.
- * @return bool True on success.
+ * @return Array True on success.
  */
 function close_riddle($riddle_id, $text) {
 
@@ -46,7 +46,7 @@ function close_riddle($riddle_id, $text) {
 
     db_perform_action("START TRANSACTION;");
     db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$clean_text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
-    $stats = db_table_query("SELECT answer.telegram_id as telegram_id, riddle.answer = answer.text as success FROM `answer` LEFT JOIN riddle ON answer.riddle_id = riddle.id WHERE riddle.id = $riddle_id order by riddle.answer = answer.text DESC, answer.last_update DESC;");
+    $stats = db_table_query("SELECT answer.telegram_id as telegram_id, riddle.answer = answer.text as success FROM `answer` LEFT JOIN riddle ON answer.riddle_id = riddle.id WHERE riddle.id = $riddle_id order by riddle.answer = answer.text DESC, answer.last_update ASC;");
     db_perform_action("COMMIT");
 
     return $stats;
@@ -129,9 +129,19 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 
     if($riddle_id) {
         $clean_text = db_escape(extract_response($text));
-        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}', '{$clean_text}', DEFAULT)") === 1;
+        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, '{$riddle_id}', '{$clean_text}', DEFAULT)") === 1;
     }
 
     throw new ErrorException('No open riddles');
 }
 
+//RESET DB
+function reset_db() {
+
+    db_perform_action("START TRANSACTION;");
+    db_perform_action("TRUNCATE answer");
+    db_perform_action("DELETE FROM riddle");
+    db_perform_action("ALTER TABLE riddle AUTO_INCREMENT = 1");
+    db_perform_action("COMMIT");
+
+}
