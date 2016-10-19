@@ -42,7 +42,7 @@ function get_riddle_by_code($riddle_code) {
 function open_riddle() {
     $salt = generate_random_salt();
 
-    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}')");
+    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}', NULL) ");
 
     return $riddle_id;
 }
@@ -103,6 +103,27 @@ function get_last_open_riddle_id() {
  */
 function is_riddle_closed($riddle_id) {
     return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = {$riddle_id}") === 1;
+}
+
+/**
+ * Sets the channel message id associated to the riddle.
+ *
+ * @param $riddle_id
+ * @param $channel_message_id
+ * @return bool|int
+ */
+function set_riddle_channel_message_id($riddle_id, $channel_message_id){
+    return db_perform_action("UPDATE `riddle` SET `channel_message_id` = {$channel_message_id} WHERE `riddle`.`id` = {$riddle_id}");
+}
+
+/**
+ * Returns the channel message id associated to the riddle.
+ *
+ * @param $riddle_id
+ * @return mixed
+ */
+function get_riddle_channel_message_id($riddle_id){
+    return db_scalar_query("SELECT `channel_message_id` FROM `riddle` WHERE `riddle`.`id` = {$riddle_id}");
 }
 
 //ANSWERS
