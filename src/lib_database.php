@@ -145,6 +145,14 @@ function get_answer($telegram_id, $riddle_id) {
     return db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = {$telegram_id} AND `riddle_id` = {$riddle_id}");
 }
 
+function get_riddle_success_rate($riddle_id) {
+
+    $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id}");
+    $total =  db_scalar_query("SELECT COUNT(*) FROM `answer` WHERE `answer`.`riddle_id` = {$riddle_id}");
+
+    return intval(($successes * 100) / $total);
+}
+
 /**
  * Gets information about an answer (identified by $telegram_id, $riddle_id).
  *
@@ -159,10 +167,12 @@ function get_answer_info($telegram_id, $riddle_id, $answer_text = null) {
 
     $riddle_row = get_riddle($riddle_id);
     $is_correct = strcasecmp($riddle_row[RIDDLE_ANSWER], extract_response($answer_text)) === 0;
+    $correct_percentage = get_riddle_success_rate($riddle_id);
 
     return array(
         $is_correct,
-        $riddle_row[RIDDLE_ANSWER]
+        $riddle_row[RIDDLE_ANSWER],
+        $correct_percentage
     );
 }
 
