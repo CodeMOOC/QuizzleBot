@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 19, 2016 at 11:59 AM
+-- Generation Time: Oct 19, 2016 at 12:12 PM
 -- Server version: 5.5.46-0+deb8u1
 -- PHP Version: 5.6.17-0+deb8u1
 
@@ -61,7 +61,7 @@ CREATE TABLE `riddle` (
   `end_time` timestamp NULL DEFAULT NULL,
   `answer` tinytext CHARACTER SET utf8 COLLATE utf8_unicode_ci,
   `salt` varchar(5) COLLATE utf8_bin NOT NULL,
-  `qrcode_path` varchar(4096) COLLATE utf8_bin NOT NULL
+  `qrcode_path` varchar(4096) COLLATE utf8_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
