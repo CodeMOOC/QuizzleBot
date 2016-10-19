@@ -219,10 +219,10 @@ function change_identity_group_name($telegram_id, $group_name = NULL) {
  * Utility function to change identity status.
  * You SHOULD use one of the set_identity_*_status function instead.
  *
- * @param $telegram_id
- * @param $status
- * @param null $riddle_id
- * @return bool|int
+ * @param $telegram_id Telegram user ID.
+ * @param $status Status value.
+ * @param $riddle_id Optional riddle ID
+ * @return bool True on success.
  */
 function change_identity_status($telegram_id, $status = IDENTITY_STATUS_DEFAULT, $riddle_id = NULL) {
     $riddle_id_db = is_null($riddle_id)? 'NULL': "'$riddle_id'";
@@ -263,16 +263,6 @@ function set_identity_answering_status($telegram_id, $riddle_id) {
     return change_identity_status($telegram_id, IDENTITY_STATUS_ANSWERING, $riddle_id);
 }
 
-/**
- * Sets the identity status to REGISTERING (2)
- *
- * @param $telegram_id
- * @return bool|int
- */
-function set_identity_registering_status($telegram_id) {
-    return change_identity_status($telegram_id, IDENTITY_STATUS_REGISTERING);
-}
-
 //STATS
 
 /**
@@ -283,6 +273,7 @@ function get_riddle_success_rate($riddle_id) {
     $total =  db_scalar_query("SELECT COUNT(*) FROM `answer` WHERE `answer`.`riddle_id` = {$riddle_id}");
 
     return intval(($successes * 100) / $total);
+
 }
 
 /**
@@ -293,7 +284,7 @@ function get_riddle_success_rate($riddle_id) {
  */
 function get_riddle_current_stats($riddle_id) {
     $totals = db_row_query("SELECT COUNT(*) AS answers, SUM(identity.participants_count) AS participants FROM identity LEFT JOIN answer ON answer.telegram_id = identity.telegram_id WHERE answer.riddle_id = {$riddle_id}");
-    $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id}");
+    $successes =  get_riddle_success_rate($riddle_id);
 
     return array(
         $totals[0],
