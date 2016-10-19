@@ -34,19 +34,21 @@ function open_riddle() {
  *
  * @param $riddle_id Riddle ID.
  * @param $text Answer string.
- * @return Array True on success.
+ * @return array Answer stats of the closed riddle.
  */
 function close_riddle($riddle_id, $text) {
-
-    if(is_riddle_closed($riddle_id) == 1){
+    if(is_riddle_closed($riddle_id)){
         throw new ErrorException('Riddle already closed');
     }
 
     $clean_text = db_escape(extract_response($text));
 
-    db_perform_action("START TRANSACTION;");
+    db_perform_action("START TRANSACTION");
+
     db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$clean_text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
-    $stats = db_table_query("SELECT answer.telegram_id as telegram_id, riddle.answer = answer.text as success FROM `answer` LEFT JOIN riddle ON answer.riddle_id = riddle.id WHERE riddle.id = $riddle_id order by riddle.answer = answer.text DESC, answer.last_update ASC;");
+
+    $stats = db_table_query("SELECT `answer`.`telegram_id` as telegram_id, `riddle`.`answer` = `answer`.`text` as success FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` IS NOT NULL ORDER BY success DESC, `answer`.`last_update` ASC");
+
     db_perform_action("COMMIT");
 
     return $stats;
@@ -62,13 +64,13 @@ function get_last_open_riddle_id() {
 }
 
 /**
- * Checks whether a riddle is open or not, returning 0 or 1.
+ * Checks whether a riddle is open or not.
  *
  * @param $riddle_id
- * @return int Returns 0 or 1.
+ * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
-    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = $riddle_id");
+    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = $riddle_id") === 1;
 }
 
 //ANSWERS
@@ -95,7 +97,7 @@ function get_answer($telegram_id, $riddle_id) {
 function is_answer_correct($telegram_id, $riddle_id) {
     $answer_row = get_answer($telegram_id, $riddle_id);
 
-    if(is_riddle_closed($answer_row[ANSWER[ANSWER_RIDDLE_ID]]) != 1){
+    if(is_riddle_closed($answer_row[ANSWER[ANSWER_RIDDLE_ID]]) === false){
         throw new ErrorException('Riddle still open');
     }
 
@@ -145,3 +147,4 @@ function reset_db() {
     db_perform_action("COMMIT");
 
 }
+

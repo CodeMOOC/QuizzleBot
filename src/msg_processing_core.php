@@ -43,16 +43,27 @@ function process_text_message($context, $text) {
 
         if($context->is_abmin()) {
             // Correct answer given
-            if(close_riddle($last_open_riddle_id, $text) === true) {
-                $context->reply("Riddle closed.");
+            try {
+                $stats = close_riddle($last_open_riddle_id, $text);
 
-                // TODO: Update EVERYTHING
+                $i = 1;
+                foreach($stats as $answer) {
+                    echo "{$answer[0]} answer is {$answer[1]}" . PHP_EOL;
 
-                return;
+                    if($answer[1]) {
+                        telegram_send_message($answer[0], "Giusto! La tua risposta è stata la {$i}° ad essere registrata. 👍");
+                    }
+                    else {
+                        telegram_send_message($answer[0], "Sbagliato! La risposta corretta era “{$text}”. 😞");
+                    }
+
+                    ++$i;
+
+                    usleep(1000000 / 40); // 40 messages per second primitive rate limiting
+                }
             }
-            else {
+            catch(exception $e) {
                 $context->reply("Failure");
-                return;
             }
         }
         else {
