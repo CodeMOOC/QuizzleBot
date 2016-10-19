@@ -16,7 +16,7 @@ require_once('lib_utility.php');
  * Returns a specific riddle as an array.
  *
  * @param $riddle_id
- * @return mixed
+ * @return array Full riddle row.
  */
 function get_riddle($riddle_id) {
     return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id}");
@@ -26,38 +26,35 @@ function get_riddle($riddle_id) {
  * Returns a specific riddle as an array.
  *
  * @param $riddle_code String the riddle unique string.
+ * @return array Full riddle row.
  */
 function get_riddle_by_code($riddle_code) {
-
+    // TODO: check whether code is correct
     $riddle_id = substr($riddle_code,3);
-
     return get_riddle($riddle_id);
 }
 
 /**
- * Open a new riddle returning the new riddle Id.
- * @return Int New riddle ID.
+ * Open a new riddle returning the new riddle identifier.
+ * @return array New riddle ID and salt.
  */
 function open_riddle() {
     $salt = generate_random_salt();
 
     $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}')");
 
-    return $riddle_id;
+    return array($riddle_id, $salt);
 }
 
 /**
  * Returns the url of the QRCode associated to the specific riddle.
  *
  * @param $riddle_id Int The riddle id.
- * @return string The Url of the QRCode of the riddle.
+ * @return string The URL of the QRCode of the riddle.
  */
 function get_riddle_qrcode_url($riddle_id) {
-
     $riddle = get_riddle($riddle_id);
-
-    return generate_qr_code_url($riddle[RIDDLE[RIDDLE_SALT]].$riddle_id);
-
+    return generate_qr_code_url($riddle[RIDDLE_SALT] . $riddle_id);
 }
 
 /**
@@ -86,9 +83,10 @@ function close_riddle($riddle_id, $text) {
 }
 
 /**
- * Returns the id of the last open riddles (if there is one).
+ * Returns the id of the last open riddles (if there is one) for the current user.
+ * TODO: limit this to the current admin / current user.
  *
- * @return Int The id of the last open riddles (if any).
+ * @return int The ID of the last open riddle (if any).
  */
 function get_last_open_riddle_id() {
     return db_scalar_query("SELECT id FROM `riddle` WHERE end_time IS NULL ORDER BY `start_time` DESC LIMIT 1");
@@ -97,7 +95,7 @@ function get_last_open_riddle_id() {
 /**
  * Checks whether a riddle is open or not.
  *
- * @param $riddle_id Int The riddle id.
+ * @param $riddle_id Riddle ID.
  * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
