@@ -77,21 +77,6 @@ function close_riddle($riddle_id, $text) {
 }
 
 /**
- * Returns the ordered riddle stats (telegram_id, name).
- *
- * @param $riddle_id Int Riddle ID.
- * @return array Answer stats of the closed riddle.
- */
-function get_riddle_topten($riddle_id) {
-
-    if(!is_riddle_closed($riddle_id)){
-        throw new ErrorException('Riddle still open');
-    }
-
-    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` )  FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT 10");
-}
-
-/**
  * Returns the id of the last open riddles (if there is one) for the current user.
  * TODO: limit this to the current admin / current user.
  *
@@ -145,20 +130,12 @@ function get_answer($telegram_id, $riddle_id) {
     return db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = {$telegram_id} AND `riddle_id` = {$riddle_id}");
 }
 
-function get_riddle_success_rate($riddle_id) {
-
-    $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id}");
-    $total =  db_scalar_query("SELECT COUNT(*) FROM `answer` WHERE `answer`.`riddle_id` = {$riddle_id}");
-
-    return intval(($successes * 100) / $total);
-}
-
 /**
  * Gets information about an answer (identified by $telegram_id, $riddle_id).
  *
  * @param $telegram_id Telegram ID of the answering user.
  * @param $riddle_id Riddle ID.
- * @return array Correctness boolean, correct answer.
+ * @return array Correctness boolean, correct answer, percentage of correct answers.
  */
 function get_answer_info($telegram_id, $riddle_id, $answer_text = null) {
     if($answer_text === null) {
@@ -299,15 +276,45 @@ function set_identity_registering_status($telegram_id) {
 //STATS
 
 /**
- * Returns an array containing respectively
- * number_of_answer, number of participants
- * that answered to the riddle.
- *
- * @param $riddle_id Int The riddle id.
- * @return array
+ * Get the correct answer percentage of a riddle.
  */
-function get_riddle_current_stats($riddle_id){
-    return db_row_query("select count(*) as answers, SUM(identity.participants_count) as participants from identity LEFT JOIN answer ON answer.telegram_id = identity.telegram_id where answer.riddle_id = {$riddle_id}");
+function get_riddle_success_rate($riddle_id) {
+    $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id}");
+    $total =  db_scalar_query("SELECT COUNT(*) FROM `answer` WHERE `answer`.`riddle_id` = {$riddle_id}");
+
+    return intval(($successes * 100) / $total);
+}
+
+/**
+ * Returns statistics about a riddle.
+ *
+ * @param $riddle_id int Riddle ID.
+ * @return array Total answers, total participants, percentage of correct answers.
+ */
+function get_riddle_current_stats($riddle_id) {
+    $totals = db_row_query("SELECT COUNT(*) AS answers, SUM(identity.participants_count) AS participants FROM identity LEFT JOIN answer ON answer.telegram_id = identity.telegram_id WHERE answer.riddle_id = {$riddle_id}");
+    $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id}");
+
+    return array(
+        $totals[0],
+        $totals[1],
+        $successes
+    );
+}
+
+/**
+ * Returns the ordered riddle stats (telegram_id, name, participant count).
+ *
+ * @param $riddle_id Int Riddle ID.
+ * @return array Array of correct answers, ordered by timestamp, as
+ *               Telegram ID, name, participant count.
+ */
+function get_riddle_topten($riddle_id) {
+    if(!is_riddle_closed($riddle_id)){
+        throw new ErrorException('Riddle still open');
+    }
+
+    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` ), `identity`.`participants_count` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT 3");
 }
 
 
