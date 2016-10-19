@@ -54,10 +54,12 @@ function process_text_message($context, $text) {
             );
         }
         else {
-
+            // Riddle is still open
+            $context->reply(ANSWER_ACCEPTED);
         }
 
-        $context->reply(ANSWER_ACCEPTED);
+        set_identity_default_status($context->get_telegram_user_id());
+
         return;
     }
 }
