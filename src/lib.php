@@ -221,7 +221,7 @@ function telegram_send_location($chat_id, $latitude, $longitude, $parameters = n
  * https://core.telegram.org/bots/api#sendphoto
  *
  * @param int $chat_id Identifier of the Telegram chat session.
- * @param string $photo_path Path to the photo to attach.
+ * @param string $photo_path Path to the photo to attach or full URI.
  * @param array $parameters Additional parameters that match the API request.
  * @return object | false Parsed JSON object returned by the API or false on failure.
  */
@@ -230,8 +230,9 @@ function telegram_send_photo($chat_id, $photo_path, $caption, $parameters = null
         Logger::error('Path to attached photo must be set', __FILE__);
         return false;
     }
-    if(!file_exists($photo_path)) {
-        Logger::error("Photo at path $photo_path does not exist", __FILE__);
+    $is_remote = stripos($photo_path, 'http') === 0;
+    if(!$is_remote && !file_exists($photo_path)) {
+        Logger::error("Photo at local path {$photo_path} does not exist", __FILE__);
         return false;
     }
 
@@ -241,7 +242,7 @@ function telegram_send_photo($chat_id, $photo_path, $caption, $parameters = null
     ));
 
     $handle = prepare_curl_api_request(TELEGRAM_API_URI_PHOTO, 'POST', $parameters, array(
-        'photo' => new CURLFile($photo_path)
+        'photo' => ($is_remote) ? $photo_path : new CURLFile($photo_path)
     ));
     if($handle === false) {
         Logger::error('Failed to prepare cURL handle', __FILE__);
