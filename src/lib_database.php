@@ -273,6 +273,20 @@ function get_identity($telegram_id) {
 
 }
 
+//STATS
+
+/**
+ * Returns an array containing respectively
+ * number_of_answer, number of participants
+ * that answered to the riddle.
+ *
+ * @param $riddle_id Int The riddle id.
+ * @return array
+ */
+function get_riddle_current_stats($riddle_id){
+    return db_row_query("select count(*) as answers, SUM(identity.participants_count) as participants from identity LEFT JOIN answer ON answer.telegram_id = identity.telegram_id where answer.riddle_id = {$riddle_id}");
+}
+
 
 //DB
 
