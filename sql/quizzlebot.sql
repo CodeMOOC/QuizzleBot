@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 19, 2016 at 03:27 PM
+-- Generation Time: Oct 19, 2016 at 04:38 PM
 -- Server version: 5.5.46-0+deb8u1
 -- PHP Version: 5.6.17-0+deb8u1
 
@@ -60,7 +60,8 @@ CREATE TABLE `riddle` (
   `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `end_time` timestamp NULL DEFAULT NULL,
   `answer` tinytext CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-  `salt` varchar(5) COLLATE utf8_bin NOT NULL
+  `salt` varchar(5) COLLATE utf8_bin NOT NULL,
+  `channel_message_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --

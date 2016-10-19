@@ -29,19 +29,21 @@ function get_riddle($riddle_id) {
  * @return array Full riddle row.
  */
 function get_riddle_by_code($riddle_code) {
-    // TODO: check whether code is correct
+    $riddle_salt = substr($riddle_code,0,3);
     $riddle_id = substr($riddle_code,3);
-    return get_riddle($riddle_id);
+    return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id} AND `salt` = '{$riddle_salt}'");
 }
 
 /**
  * Open a new riddle returning the new riddle identifier.
  * @return array New riddle ID and salt.
  */
-function open_riddle() {
+function open_riddle($channel_message_id = NULL) {
     $salt = generate_random_salt();
 
-    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}')");
+    $channel_message_id_db = is_null($channel_message_id) ? 'NULL' : "'" . db_escape($channel_message_id) . "'";
+
+    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}', {$channel_message_id_db}) ");
 
     return array($riddle_id, $salt);
 }
@@ -58,11 +60,11 @@ function get_riddle_qrcode_url($riddle_id) {
 }
 
 /**
- * Closes a riddle then returns ordered riddle stats (telegram_id, success).
+ * Closes a riddle.
  *
  * @param $riddle_id Int Riddle ID.
  * @param $text String Answer string.
- * @return array Answer stats of the closed riddle.
+ * @return int|bool
  */
 function close_riddle($riddle_id, $text) {
     if(is_riddle_closed($riddle_id)){
@@ -71,15 +73,22 @@ function close_riddle($riddle_id, $text) {
 
     $clean_text = db_escape(extract_response($text));
 
-    db_perform_action("START TRANSACTION");
+    return db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '{$clean_text}', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = {$riddle_id}");
+}
 
-    db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '{$clean_text}', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = {$riddle_id}");
+/**
+ * Returns the ordered riddle stats (telegram_id, name).
+ *
+ * @param $riddle_id Int Riddle ID.
+ * @return array Answer stats of the closed riddle.
+ */
+function get_riddle_topten($riddle_id) {
 
-    $stats = db_table_query("SELECT `answer`.`telegram_id` as telegram_id, `riddle`.`answer` = `answer`.`text` as success FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` IS NOT NULL ORDER BY success DESC, `answer`.`last_update` ASC");
+    if(!is_riddle_closed($riddle_id)){
+        throw new ErrorException('Riddle still open');
+    }
 
-    db_perform_action("COMMIT");
-
-    return $stats;
+    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` )  FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT 10");
 }
 
 /**
@@ -99,7 +108,28 @@ function get_last_open_riddle_id() {
  * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
-    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = {$riddle_id}") === 1;
+    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE `id` = {$riddle_id}") == 1;
+}
+
+/**
+ * Sets the channel message id associated to the riddle.
+ *
+ * @param $riddle_id
+ * @param $channel_message_id
+ * @return bool|int
+ */
+function set_riddle_channel_message_id($riddle_id, $channel_message_id){
+    return db_perform_action("UPDATE `riddle` SET `channel_message_id` = {$channel_message_id} WHERE `riddle`.`id` = {$riddle_id}");
+}
+
+/**
+ * Returns the channel message id associated to the riddle.
+ *
+ * @param $riddle_id
+ * @return mixed
+ */
+function get_riddle_channel_message_id($riddle_id){
+    return db_scalar_query("SELECT `channel_message_id` FROM `riddle` WHERE `riddle`.`id` = {$riddle_id}");
 }
 
 //ANSWERS
@@ -207,7 +237,7 @@ function change_identity_group_name($telegram_id, $group_name = NULL) {
  * @param null $riddle_id
  * @return bool|int
  */
-function change_identity_status($telegram_id, $status = IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT], $riddle_id = NULL) {
+function change_identity_status($telegram_id, $status = IDENTITY_STATUS_DEFAULT, $riddle_id = NULL) {
     $riddle_id_db = is_null($riddle_id)? 'NULL': "'$riddle_id'";
 
     return db_perform_action("UPDATE `identity` SET `status` = {$status}, `riddle_id`  = {$riddle_id_db} WHERE `identity`.`telegram_id` = {$telegram_id}");
@@ -233,7 +263,7 @@ function set_identity_participants_count($telegram_id, $count = 1){
  * @return bool|int
  */
 function set_identity_default_status($telegram_id) {
-    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT]);
+    return change_identity_status($telegram_id, IDENTITY_STATUS_DEFAULT);
 }
 
 /**
@@ -243,7 +273,7 @@ function set_identity_default_status($telegram_id) {
  * @return bool|int
  */
 function set_identity_answering_status($telegram_id, $riddle_id) {
-    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_ASWERING], $riddle_id);
+    return change_identity_status($telegram_id, IDENTITY_STATUS_ANSWERING, $riddle_id);
 }
 
 /**
@@ -253,7 +283,7 @@ function set_identity_answering_status($telegram_id, $riddle_id) {
  * @return bool|int
  */
 function set_identity_registering_status($telegram_id) {
-    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_REGISTERING]);
+    return change_identity_status($telegram_id, IDENTITY_STATUS_REGISTERING);
 }
 
 //STATS

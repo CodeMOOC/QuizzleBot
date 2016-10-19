@@ -252,32 +252,20 @@ function generate_random_salt(){
     return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') , 0 , 3 );
 }
 
-const RIDDLE_ID             = 0;
-const RIDDLE_START_TIME     = 1;
-const RIDDLE_ENS_TIME       = 2;
-const RIDDLE_ANSWER         = 3;
-const RIDDLE_SALT           = 4;
+const RIDDLE_ID                 = 0;
+const RIDDLE_START_TIME         = 1;
+const RIDDLE_ENS_TIME           = 2;
+const RIDDLE_ANSWER             = 3;
+const RIDDLE_SALT               = 4;
+const RIDDLE_CHANNEL_MESSAGE_ID = 5;
 
 
-const RIDDLE             = array(
-    RIDDLE_ID,
-    RIDDLE_START_TIME,
-    RIDDLE_ENS_TIME,
-    RIDDLE_ANSWER,
-    RIDDLE_SALT
-);
 
 const ANSWER_TELEGRAM_ID    = 0;
 const ANSWER_RIDDLE_ID      = 1;
 const ANSWER_TEXT           = 2;
 const ANSWER_LAST_UPDATE    = 3;
 
-const ANSWER             = array(
-    ANSWER_TELEGRAM_ID,
-    ANSWER_RIDDLE_ID,
-    ANSWER_TEXT,
-    ANSWER_LAST_UPDATE
-);
 
 const IDENTITY_TELEGRAM_ID          = 0;
 const IDENTITY_FIRST_NAME           = 1;
@@ -288,24 +276,10 @@ const IDENTITY_RIDDLE_ID            = 5;
 const IDENTITY_PARTICIPANTS_COUNT   = 6;
 
 
-const IDENTITY             = array(
-    IDENTITY_TELEGRAM_ID,
-    IDENTITY_FIRST_NAME,
-    IDENTITY_FULL_NAME,
-    IDENTITY_GROUP_NAME,
-    IDENTITY_STATUS,
-    IDENTITY_RIDDLE_ID,
-    IDENTITY_PARTICIPANTS_COUNT
-);
 
 const IDENTITY_STATUS_DEFAULT       = 0;
 const IDENTITY_STATUS_ANSWERING     = 1;
 const IDENTITY_STATUS_REGISTERING   = 2;
 
-const IDENTITY_STATUS_TYPE       = array(
-    IDENTITY_STATUS_DEFAULT,
-    IDENTITY_STATUS_ANSWERING,
-    IDENTITY_STATUS_REGISTERING
-);
 
 ?>
