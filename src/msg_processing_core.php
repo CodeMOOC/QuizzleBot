@@ -23,20 +23,20 @@ function process_text_message($context, $text) {
 
             Logger::info("New riddle ID: {$new_riddle_id}", __FILE__, $context);
 
-            $context->reply("Ok.");
+            $context->reply(QUIZ_CREATED_OK);
         }
         else {
-            $context->reply("Riddle still open! Give answer");
+            $context->reply(QUIZ_ALREADY_OPEN);
         }
     }
     else if($command === 'help') {
-        $context->reply("Ah, a <i>te</i> serve aiuto?");
+        $context->reply(COMMAND_HELP);
     }
     else if($command === null) {
         if($last_open_riddle_id === null) {
-            $context->reply("Nessun quiz attivo.");
+            $context->reply(ANSWER_NO_QUIZ);
             if($context->is_abmin()) {
-                $context->reply("Devi attivare un quiz col comando /new.");
+                $context->reply(ANSWER_NO_QUIZ_ADMIN);
             }
             return;
         }
@@ -50,12 +50,11 @@ function process_text_message($context, $text) {
                 foreach($stats as $answer) {
                     echo "{$answer[0]} answer is {$answer[1]}" . PHP_EOL;
 
-                    if($answer[1]) {
-                        telegram_send_message($answer[0], "Giusto! La tua risposta è stata la {$i}° ad essere registrata. 👍");
-                    }
-                    else {
-                        telegram_send_message($answer[0], "Sbagliato! La risposta corretta era “{$text}”. 😞");
-                    }
+                    $add_values = array(
+                        '%INDEX%' => $i,
+                        '%CORRECT_ANSWER%' => $text
+                    );
+                    $context->send($answer[0], ($answer[1]) ? ANSWER_CORRECT : ANSWER_WRONG, $add_values);
 
                     ++$i;
 
@@ -68,13 +67,14 @@ function process_text_message($context, $text) {
         }
         else {
             // User answer given
-            $result = insert_answer($in->from_id, $text, $last_open_riddle_id);
-            $context->reply("Result: " . print_r($result, true));
+            insert_answer($in->from_id, $text, $last_open_riddle_id);
+
+            $context->reply(ANSWER_ACCEPTED);
             return;
         }
     }
     else {
-        $context->reply("Comando non previsto");
+        $context->reply(COMMAND_UNKNOWN);
     }
 }
 
@@ -88,7 +88,7 @@ function process_message($context) {
             process_text_message($context, $context->get_message()->text);
         }
         else {
-            $context->reply("Messaggio non supportato");
+            $context->reply(MESSAGE_NOT_SUPPORTED);
         }
     }
 }
