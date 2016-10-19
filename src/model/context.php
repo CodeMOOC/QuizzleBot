@@ -97,9 +97,9 @@ class Context {
 
     /**
      * Replies to the current incoming message.
-     * Enables markdown parsing and disables web previews by default.
+     * Enables HTML parsing and disables web previews by default.
      */
-    function reply($message, $additional_values = null) {
+    function reply($message, $additional_values = null, $additional_parameters = null) {
         $hydration_values = array(
             '%FIRST_NAME%' => $this->get_message()->get_sender_first_name(),
             '%FULL_NAME%' => $this->get_message()->get_sender_full_name()
@@ -110,10 +110,10 @@ class Context {
         return telegram_send_message(
             $this->get_telegram_chat_id(),
             $hydrated,
-            array(
+            unite_arrays(array(
                 'parse_mode' => 'HTML',
                 'disable_web_page_preview' => true
-            )
+            ), $additional_parameters)
         );
     }
 
@@ -137,6 +137,9 @@ class Context {
         );
     }
 
+    /**
+     * Refreshes the context from the DB.
+     */
     function refresh() {
         $identity = get_identity($this->get_telegram_user_id(), $this->message->get_sender_first_name(), $this->message->get_sender_full_name());
 

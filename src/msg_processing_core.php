@@ -11,6 +11,10 @@ require_once('model/context.php');
 require_once('lib.php');
 require_once('msg_processing_commands.php');
 
+/**
+ * Attempts to switch to "quiz answering" mode, by quiz code.
+ * Replies to user if code is not recognized.
+ */
 function switch_to_riddle($context, $code) {
     $riddle_info = get_riddle_by_code($code);
     if($riddle_info === null) {
@@ -32,6 +36,9 @@ function switch_to_riddle($context, $code) {
     $context->reply(START_RECOGNIZED);
 }
 
+/**
+ * Handles generic input text based on user status.
+ */
 function process_status($context, $text) {
     $status = $context->get_status();
 
