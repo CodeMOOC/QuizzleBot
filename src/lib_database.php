@@ -29,9 +29,10 @@ function get_riddle($riddle_id) {
  */
 function get_riddle_by_code($riddle_code) {
 
+    $riddle_salt = substr($riddle_code,0,2);
     $riddle_id = substr($riddle_code,3);
 
-    return get_riddle($riddle_id);
+    return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id} AND `salt` = '{$riddle_salt}'");
 }
 
 /**
@@ -253,7 +254,7 @@ function set_identity_default_status($telegram_id) {
  * @return bool|int
  */
 function set_identity_answering_status($telegram_id, $riddle_id) {
-    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_ASWERING], $riddle_id);
+    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_ANSWERING], $riddle_id);
 }
 
 /**
