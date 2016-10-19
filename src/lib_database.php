@@ -18,7 +18,7 @@ require_once ('lib_core_database.php');
  * @return mixed
  */
 function get_riddle($riddle_id) {
-    return db_row_query("SELECT * FROM `riddle` WHERE `id` = $riddle_id");
+    return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id}");
 }
 
 /**
@@ -76,7 +76,7 @@ function close_riddle($riddle_id, $text) {
 
     db_perform_action("START TRANSACTION");
 
-    db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '$clean_text', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = $riddle_id");
+    db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '{$clean_text}', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = {$riddle_id}");
 
     $stats = db_table_query("SELECT `answer`.`telegram_id` as telegram_id, `riddle`.`answer` = `answer`.`text` as success FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` IS NOT NULL ORDER BY success DESC, `answer`.`last_update` ASC");
 
@@ -101,7 +101,7 @@ function get_last_open_riddle_id() {
  * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
-    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = $riddle_id") === 1;
+    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = {$riddle_id}") === 1;
 }
 
 //ANSWERS
@@ -114,7 +114,7 @@ function is_riddle_closed($riddle_id) {
  * @return array
  */
 function get_answer($telegram_id, $riddle_id) {
-    return  db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = $telegram_id AND `riddle_id` = $riddle_id ORDER BY answer.last_update DESC" );
+    return  db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = {$telegram_id} AND `riddle_id` = {$riddle_id} ORDER BY answer.last_update DESC" );
 }
 
 /**
@@ -145,7 +145,7 @@ function is_answer_correct($telegram_id, $riddle_id) {
  * @return bool|int
  */
 function delete_already_answered($telegram_id, $riddle_id) {
-    return db_perform_action("DELETE FROM `answer` WHERE riddle_id = $riddle_id AND telegram_id = $telegram_id");
+    return db_perform_action("DELETE FROM `answer` WHERE riddle_id = {$riddle_id} AND telegram_id = {$telegram_id}");
 }
 
 /**
@@ -169,6 +169,111 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
     throw new ErrorException('No open riddles');
 }
 
+//IDENTITIES
+
+/**
+ * Create a new identity record and returns its id.
+ *
+ * @param $telegram_id
+ * @param $first_name
+ * @param $full_name
+ * @param null $group_name
+ * @param $status
+ * @param null $riddle_id
+ * @return bool|int The id of the newly created identity or False.
+ */
+function insert_identity($telegram_id, $first_name, $full_name, $group_name = NULL, $status = IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT],  $riddle_id = NULL){
+
+    $group_name_db = is_null($group_name)? 'NULL': "'$group_name'";
+    $riddle_id_db = is_null($riddle_id)? 'NULL': "'$riddle_id'";
+
+    return db_perform_action("INSERT INTO `identity` (`telegram_id`, `first_name`, `full_name`, `group_name`, `status`, `riddle_id`) VALUES ('{$telegram_id}', '{$first_name}', '{$full_name}', {$group_name_db}, '{$status}', {$riddle_id_db} )");
+}
+
+/**
+ * Changes the identity group name.
+ *
+ * @param $telegram_id
+ * @param null $group_name
+ * @return bool|int
+ */
+function change_identity_group_name($telegram_id, $group_name = NULL) {
+    $group_name_db = is_null($group_name)? 'NULL': "'$group_name'";
+
+    return db_perform_action("UPDATE `identity` SET `group_name` = {$group_name_db} WHERE `identity`.`telegram_id` = {$telegram_id}");
+}
+
+/**
+ * Utility function to change identity status.
+ * You SHOULD use one of the set_identity_*_status function instead.
+ *
+ * @param $telegram_id
+ * @param $status
+ * @param null $riddle_id
+ * @return bool|int
+ */
+function change_identity_status($telegram_id, $status = IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT], $riddle_id = NULL) {
+    $riddle_id_db = is_null($riddle_id)? 'NULL': "'$riddle_id'";
+
+    return db_perform_action("UPDATE `identity` SET `status` = {$status}, `riddle_id`  = {$riddle_id_db} WHERE `identity`.`telegram_id` = {$telegram_id}");
+}
+
+
+/**
+ * Sets the participants count
+ *
+ * @param $telegram_id
+ * @param int $count DEFAULT is 1
+ * @return bool|int
+ */
+function set_identity_participants_count($telegram_id, $count = 1){
+    return db_perform_action("UPDATE `identity` SET `participants_count` = {$count} WHERE `identity`.`telegram_id` = {$telegram_id}");
+
+}
+
+
+/**
+ * Sets the identity status to DEFAULT (0)
+ *
+ * @param $telegram_id
+ * @return bool|int
+ */
+function set_identity_default_status($telegram_id) {
+    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT]);
+}
+
+/**
+ * Sets the identity status to ANSWERING (1)
+ *
+ * @param $telegram_id
+ * @return bool|int
+ */
+function set_identity_answering_status($telegram_id, $riddle_id) {
+    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_ASWERING], $riddle_id);
+}
+
+/**
+ * Sets the identity status to REGISTERING (2)
+ *
+ * @param $telegram_id
+ * @return bool|int
+ */
+function set_identity_registering_status($telegram_id) {
+    return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_REGISTERING]);
+}
+
+/**
+ * Returns the identity record.
+ *
+ * @param $telegram_id
+ * @return array
+ */
+function get_identity($telegram_id) {
+    return db_row_query("SELECT * FROM `identity` WHERE `telegram_id` = {$telegram_id}");
+
+}
+
+
 //DB
 
 /**
@@ -178,7 +283,8 @@ function reset_db() {
 
     db_perform_action("START TRANSACTION;");
     db_perform_action("TRUNCATE answer");
-    db_perform_action("TRUNCATE identity");
+    db_perform_action("DELETE FROM identity");
+    db_perform_action("ALTER TABLE identity AUTO_INCREMENT = 1");
     db_perform_action("DELETE FROM riddle");
     db_perform_action("ALTER TABLE riddle AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");
