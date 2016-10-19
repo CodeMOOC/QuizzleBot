@@ -249,7 +249,7 @@ function db_escape($s) {
  * @return string
  */
 function generate_random_salt(){
-    return mb_strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') , 0 , 2 ));
+    return mb_strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2));
 }
 
 const RIDDLE_ID                 = 0;

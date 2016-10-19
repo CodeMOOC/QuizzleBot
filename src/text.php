@@ -25,7 +25,6 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const RESET_OK = "Tutto dimenticato.";
 
-const CHANNEL_NEW_RIDDLE = "Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
 const REGISTER_QUERY_CONFIRM = "Ok, vuoi che ti registri come gruppo?";
 const REGISTER_AFFIRMATIVE = array('si', 'sì', 'ok', 'certo', 'va bene', 'bene');
 const REGISTER_QUERY_NAME = "Certo, %FIRST_NAME%. Qual è il nome del tuo gruppo?";
