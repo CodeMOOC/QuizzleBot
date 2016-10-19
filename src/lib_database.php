@@ -22,18 +22,49 @@ function get_riddle($riddle_id) {
 }
 
 /**
+ * Returns a specific riddle as an array.
+ *
+ * @param $riddle_code String the riddle unique string.
+ */
+function get_riddle_by_code($riddle_code) {
+
+    $riddle_id = substr($riddle_code,3);
+
+    return get_riddle($riddle_id);
+}
+
+/**
  * Open a new riddle returning the new riddle Id.
  * @return Int New riddle ID.
  */
 function open_riddle() {
-    return db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL)");
+
+    $salt = generate_random_salt();
+
+    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}')");
+
+    return $riddle_id;
+}
+
+/**
+ * Returns the url of the QRCode associated to the specific riddle.
+ *
+ * @param $riddle_id Int The riddle id.
+ * @return string The Url of the QRCode of the riddle.
+ */
+function get_riddle_qrcode_url($riddle_id) {
+
+    $riddle = get_riddle($riddle_id);
+
+    return generate_qr_code_url($riddle[RIDDLE[RIDDLE_SALT]].$riddle_id);
+
 }
 
 /**
  * Closes a riddle then returns ordered riddle stats (telegram_id, success).
  *
- * @param $riddle_id Riddle ID.
- * @param $text Answer string.
+ * @param $riddle_id Int Riddle ID.
+ * @param $text String Answer string.
  * @return array Answer stats of the closed riddle.
  */
 function close_riddle($riddle_id, $text) {
@@ -57,7 +88,7 @@ function close_riddle($riddle_id, $text) {
 /**
  * Returns the id of the last open riddles (if there is one).
  *
- * @return Int
+ * @return Int The id of the last open riddles (if any).
  */
 function get_last_open_riddle_id() {
     return db_scalar_query("SELECT id FROM `riddle` WHERE end_time IS NULL ORDER BY `start_time` DESC LIMIT 1");
@@ -66,7 +97,7 @@ function get_last_open_riddle_id() {
 /**
  * Checks whether a riddle is open or not.
  *
- * @param $riddle_id
+ * @param $riddle_id Int The riddle id.
  * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
@@ -78,9 +109,9 @@ function is_riddle_closed($riddle_id) {
 /**
  * Returns a specific answer identified by $telegram_id, $riddle_id, as an array.
  *
- * @param $user_id
- * @param $riddle_id
- * @return mixed
+ * @param $user_id Int the telegram id of the user.
+ * @param $riddle_id Int the riddle id.
+ * @return array
  */
 function get_answer($telegram_id, $riddle_id) {
     return  db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = $telegram_id AND `riddle_id` = $riddle_id ORDER BY answer.last_update DESC" );
@@ -92,7 +123,7 @@ function get_answer($telegram_id, $riddle_id) {
  * @param $user_id
  * @param $riddle_id
  * @return bool
- * @throws ErrorException
+ * @throws ErrorException if the riddle is still open.
  */
 function is_answer_correct($telegram_id, $riddle_id) {
     $answer_row = get_answer($telegram_id, $riddle_id);
@@ -123,6 +154,7 @@ function delete_already_answered($telegram_id, $riddle_id) {
  * @param $text Answer to register.
  * @param $riddle_id ID of the riddle. Null defaults to last open riddle,. if any.
  * @return bool True on success. False otherwise.
+ * @throws ErrorException if there are no open riddles.
  */
 function insert_answer($telegram_id, $text, $riddle_id = null) {
     if($riddle_id === null) {
@@ -136,7 +168,6 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 
     throw new ErrorException('No open riddles');
 }
-
 
 //DB
 
