@@ -17,7 +17,7 @@ class Context {
 
     private $group_name = null;
     private $group_participants = 1;
-    private $state = 0;
+    private $status = 0;
     private $active_riddle_id = null;
 
     /**
@@ -57,6 +57,20 @@ class Context {
      */
     function get_message() {
         return $this->message;
+    }
+
+    /**
+     * Gets the current riddle ID based on user and bot status.
+     * @return int Current riddle ID or null if no active riddle.
+     */
+    function get_current_riddle_id() {
+        // Non-admins, while answering to a given riddle
+        if(!$this->is_abmin() && $this->status === IDENTITY_STATUS_ANSWERING && $this->active_riddle_id !== null) {
+            return $this->active_riddle_id;
+        }
+
+        // Get last open riddle, if any
+        return get_last_open_riddle_id();
     }
 
     /**
@@ -114,6 +128,11 @@ class Context {
 
     function refresh() {
         $identity = get_identity($this->get_telegram_user_id(), $this->message->get_sender_first_name(), $this->message->get_sender_full_name());
+
+        $this->group_name = $identity[IDENTITY_GROUP_NAME];
+        $this->group_participants = $identity[IDENTITY_PARTICIPANTS_COUNT];
+        $this->status = $identity[IDENTITY_STATUS];
+        $this->active_riddle_id = $identity[IDENTITY_RIDDLE_ID];
     }
 
 }

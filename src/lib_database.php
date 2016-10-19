@@ -174,13 +174,13 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 /**
  * Gets and refreshes the user's identity.
  *
- * @return array Group name, count of participants, user status and current riddle ID.
+ * @return array Full identity row.
  */
 function get_identity($telegram_user_id, $first_name, $full_name) {
     $clean_first_name = db_escape($first_name);
     $clean_full_name  = db_escape($full_name);
 
-    $identity = db_row_query("SELECT `group_name`, `participants_count`, `status`, `riddle_id` FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
+    $identity = db_row_query("SELECT * FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
     if($identity === null) {
         // New user
         db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT, DEFAULT)");
@@ -265,8 +265,6 @@ function set_identity_answering_status($telegram_id, $riddle_id) {
 function set_identity_registering_status($telegram_id) {
     return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_REGISTERING]);
 }
-
-
 
 //STATS
 
