@@ -67,7 +67,7 @@ function process_text_message($context, $text) {
         }
         else {
             // User answer given
-            insert_answer($in->from_id, $text, $last_open_riddle_id);
+            insert_answer($context->get_message()->from_id, $text, $last_open_riddle_id);
 
             $context->reply(ANSWER_ACCEPTED);
             return;

@@ -131,7 +131,7 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 
     if($riddle_id) {
         $clean_text = db_escape(extract_response($text));
-        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, '{$riddle_id}', '{$clean_text}', DEFAULT)") === 1;
+        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}, '{$clean_text}', DEFAULT)") === 1;
     }
 
     throw new ErrorException('No open riddles');
