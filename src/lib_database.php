@@ -149,24 +149,15 @@ function delete_already_answered($telegram_id, $riddle_id) {
 }
 
 /**
- * Inserts answer to a riddle.
+ * Provides an answer to a riddle.
  * @param $telegram_id Telegram ID of the user.
+ * @param $riddle_id ID of the riddle
  * @param $text Answer to register.
- * @param $riddle_id ID of the riddle. Null defaults to last open riddle,. if any.
  * @return bool True on success. False otherwise.
- * @throws ErrorException if there are no open riddles.
  */
-function insert_answer($telegram_id, $text, $riddle_id = null) {
-    if($riddle_id === null) {
-        $riddle_id = get_last_open_riddle_id();
-    }
-
-    if($riddle_id) {
-        $clean_text = db_escape(extract_response($text));
-        return db_perform_action("REPLACE INTO `answer` VALUES ({$telegram_id}, {$riddle_id}, '{$clean_text}', DEFAULT)") === 1;
-    }
-
-    throw new ErrorException('No open riddles');
+function insert_answer($telegram_id, $riddle_id, $text) {
+    $clean_text = db_escape(extract_response($text));
+    return db_perform_action("INSERT INTO `answer` VALUES ({$telegram_id}, {$riddle_id}, '{$clean_text}', DEFAULT)") === 1;
 }
 
 //IDENTITIES
