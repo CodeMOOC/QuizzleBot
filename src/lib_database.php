@@ -9,8 +9,34 @@
 
 require_once ('lib_core_database.php');
 
+//IDENTITIES
+
+/**
+ * Gets and refreshes the user's identity.
+ *
+ * @return array Group name, count of participants, user status and current riddle ID.
+ */
+function get_identity($telegram_user_id, $first_name, $full_name) {
+    $clean_first_name = db_escape($first_name);
+    $clean_full_name  = db_escape($full_name);
+
+    $identity = db_row_query("SELECT `group_name`, `participants_count`, `status`, `riddle_id` FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
+    if($identity === null) {
+        // New user
+        db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT)");
+
+        return array(null, 1, 0, null);
+    }
+    else {
+        // Returning user
+        db_perform_action("UPDATE `identity` SET `first_name` = '{$clean_first_name}', `full_name` = '{$clean_full_name}' WHERE `telegram_id` = {$telegram_user_id}");
+
+        return $identity;
+    }
+}
 
 //RIDDLES
+
 /**
  * Returns a specific riddle as an array.
  *
@@ -38,7 +64,6 @@ function get_riddle_by_code($riddle_code) {
  * @return Int New riddle ID.
  */
 function open_riddle() {
-
     $salt = generate_random_salt();
 
     $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}')");
@@ -280,14 +305,12 @@ function get_identity($telegram_id) {
  * Completely wipes out the DB data.
  */
 function reset_db() {
-
-    db_perform_action("START TRANSACTION;");
-    db_perform_action("TRUNCATE answer");
+    db_perform_action("START TRANSACTION");
+    db_perform_action("TRUNCATE `answer`");
     db_perform_action("DELETE FROM identity");
     db_perform_action("ALTER TABLE identity AUTO_INCREMENT = 1");
-    db_perform_action("DELETE FROM riddle");
-    db_perform_action("ALTER TABLE riddle AUTO_INCREMENT = 1");
+    db_perform_action("DELETE FROM `riddle`");
+    db_perform_action("ALTER TABLE `riddle` AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");
-
 }
 
