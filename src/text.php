@@ -26,6 +26,15 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 const RESET_OK = "Tutto dimenticato.";
 
 const CHANNEL_NEW_RIDDLE = "Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
+const REGISTER_QUERY_CONFIRM = "Ok, vuoi che ti registri come gruppo?";
+const REGISTER_AFFIRMATIVE = array('si', 'sì', 'ok', 'certo', 'va bene', 'bene');
+const REGISTER_QUERY_NAME = "Certo, %FIRST_NAME%. Qual è il nome del tuo gruppo?";
+const REGISTER_QUERY_PARTICIPANTS = "In quanti siete? (Incluso te.)";
+const REGISTER_QUERY_OK = "Perfetto. 👍";
+const REGISTER_RESET= "Ok, %FIRST_NAME%. Ti considererò come giocatore individuale.";
+const REGISTER_INVALID_NAME = "Non mi sembra un nome corretto.";
+const REGISTER_INVALID_COUNT = "Specifica il numero in cifre.";
+
 const CHANNEL_NEW_RIDDLE = "📢 Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
 const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b>\nPartecipanti: <b>%TOTAL_PARTICIPANTS%</b>\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
 const CHANNEL_CORRECT_ANSWER = "La risposta corretta era “%ANSWER%”. ✔️";

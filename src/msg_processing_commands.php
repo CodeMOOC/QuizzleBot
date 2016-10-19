@@ -51,6 +51,13 @@ function process_command($context, $text) {
 
         return true;
     }
+    else if($command === 'register') {
+        change_identity_status($context->get_telegram_user_id(), IDENTITY_STATUS_REG_CONFIRM);
+
+        $context->reply(REGISTER_QUERY_CONFIRM);
+
+        return true;
+    }
     else if($command === 'help') {
         $context->reply(COMMAND_HELP);
 

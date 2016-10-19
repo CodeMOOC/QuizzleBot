@@ -78,6 +78,13 @@ class Context {
     }
 
     /**
+     * Gets the user's status.
+     */
+    function get_status() {
+        return $this->status;
+    }
+
+    /**
      * Gets a cleaned-up response from the user, if any.
      */
     function get_response() {
