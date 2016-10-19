@@ -15,6 +15,11 @@ class Context {
 
     private $message;
 
+    private $group_name = null;
+    private $group_participants = 1;
+    private $state = 0;
+    private $active_riddle_id = null;
+
     /**
      * Construct Context class.
      * @param §message IncomingMessage.
@@ -24,6 +29,8 @@ class Context {
             die('Message variable is not an IncomingMessage instance');
 
         $this->message = $message;
+
+        $this->refresh();
     }
 
     /* True if the talking user is an admin */
@@ -103,6 +110,10 @@ class Context {
                 'disable_web_page_preview' => true
             )
         );
+    }
+
+    function refresh() {
+        $identity = get_identity($this->get_telegram_user_id(), $this->message->get_sender_first_name(), $this->message->get_sender_full_name());
     }
 
 }
