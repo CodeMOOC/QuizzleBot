@@ -9,32 +9,6 @@
 
 require_once ('lib_core_database.php');
 
-//IDENTITIES
-
-/**
- * Gets and refreshes the user's identity.
- *
- * @return array Group name, count of participants, user status and current riddle ID.
- */
-function get_identity($telegram_user_id, $first_name, $full_name) {
-    $clean_first_name = db_escape($first_name);
-    $clean_full_name  = db_escape($full_name);
-
-    $identity = db_row_query("SELECT `group_name`, `participants_count`, `status`, `riddle_id` FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
-    if($identity === null) {
-        // New user
-        db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT)");
-
-        return array(null, 1, 0, null);
-    }
-    else {
-        // Returning user
-        db_perform_action("UPDATE `identity` SET `first_name` = '{$clean_first_name}', `full_name` = '{$clean_full_name}' WHERE `telegram_id` = {$telegram_user_id}");
-
-        return $identity;
-    }
-}
-
 //RIDDLES
 
 /**
@@ -197,22 +171,27 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
 //IDENTITIES
 
 /**
- * Create a new identity record and returns its id.
+ * Gets and refreshes the user's identity.
  *
- * @param $telegram_id
- * @param $first_name
- * @param $full_name
- * @param null $group_name
- * @param $status
- * @param null $riddle_id
- * @return bool|int The id of the newly created identity or False.
+ * @return array Group name, count of participants, user status and current riddle ID.
  */
-function insert_identity($telegram_id, $first_name, $full_name, $group_name = NULL, $status = IDENTITY_STATUS_TYPE[IDENTITY_STATUS_DEFAULT],  $riddle_id = NULL){
+function get_identity($telegram_user_id, $first_name, $full_name) {
+    $clean_first_name = db_escape($first_name);
+    $clean_full_name  = db_escape($full_name);
 
-    $group_name_db = is_null($group_name)? 'NULL': "'$group_name'";
-    $riddle_id_db = is_null($riddle_id)? 'NULL': "'$riddle_id'";
+    $identity = db_row_query("SELECT `group_name`, `participants_count`, `status`, `riddle_id` FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
+    if($identity === null) {
+        // New user
+        db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT)");
 
-    return db_perform_action("INSERT INTO `identity` (`telegram_id`, `first_name`, `full_name`, `group_name`, `status`, `riddle_id`) VALUES ('{$telegram_id}', '{$first_name}', '{$full_name}', {$group_name_db}, '{$status}', {$riddle_id_db} )");
+        return array(null, 1, IDENTITY_STATUS_DEFAULT, null);
+    }
+    else {
+        // Returning user
+        db_perform_action("UPDATE `identity` SET `first_name` = '{$clean_first_name}', `full_name` = '{$clean_full_name}' WHERE `telegram_id` = {$telegram_user_id}");
+
+        return $identity;
+    }
 }
 
 /**
@@ -253,7 +232,6 @@ function change_identity_status($telegram_id, $status = IDENTITY_STATUS_TYPE[IDE
  */
 function set_identity_participants_count($telegram_id, $count = 1){
     return db_perform_action("UPDATE `identity` SET `participants_count` = {$count} WHERE `identity`.`telegram_id` = {$telegram_id}");
-
 }
 
 
@@ -295,9 +273,7 @@ function set_identity_registering_status($telegram_id) {
  */
 function get_identity($telegram_id) {
     return db_row_query("SELECT * FROM `identity` WHERE `telegram_id` = {$telegram_id}");
-
 }
-
 
 //DB
 
@@ -307,8 +283,8 @@ function get_identity($telegram_id) {
 function reset_db() {
     db_perform_action("START TRANSACTION");
     db_perform_action("TRUNCATE `answer`");
-    db_perform_action("DELETE FROM identity");
-    db_perform_action("ALTER TABLE identity AUTO_INCREMENT = 1");
+    db_perform_action("DELETE FROM `identity`");
+    db_perform_action("ALTER TABLE `identity` AUTO_INCREMENT = 1");
     db_perform_action("DELETE FROM `riddle`");
     db_perform_action("ALTER TABLE `riddle` AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");
