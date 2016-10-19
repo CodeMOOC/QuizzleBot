@@ -33,6 +33,13 @@ function process_command($context, $text) {
 
         return true;
     }
+    else if($command === 'reset' && $context->is_abmin()) {
+        reset_db();
+
+        $context->reply("All is forgotten.");
+
+        return true;
+    }
     else if($command === 'help') {
         $context->reply(COMMAND_HELP);
 
