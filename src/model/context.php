@@ -130,9 +130,13 @@ class Context {
         $identity = get_identity($this->get_telegram_user_id(), $this->message->get_sender_first_name(), $this->message->get_sender_full_name());
 
         $this->group_name = $identity[IDENTITY_GROUP_NAME];
-        $this->group_participants = $identity[IDENTITY_PARTICIPANTS_COUNT];
-        $this->status = $identity[IDENTITY_STATUS];
-        $this->active_riddle_id = $identity[IDENTITY_RIDDLE_ID];
+        $this->group_participants = intval($identity[IDENTITY_PARTICIPANTS_COUNT]);
+        if($identity[IDENTITY_STATUS])
+            $this->status = intval($identity[IDENTITY_STATUS]);
+        if($identity[IDENTITY_RIDDLE_ID])
+            $this->active_riddle_id = intval($identity[IDENTITY_RIDDLE_ID]);
+
+        Logger::debug("Group {$this->group_name}, part. {$this->group_participants}, status {$this->status}, active riddle {$this->active_riddle_id} (" . (($this->is_abmin()) ? "is admin" : "is NOT admin") . ")", __FILE__, $this);
     }
 
 }
