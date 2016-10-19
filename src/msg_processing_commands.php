@@ -25,7 +25,7 @@ function process_command($context, $text) {
             $riddle_deeplink_url = get_riddle_qrcode_url($new_riddle_data[0]);
 
             telegram_send_photo($context->get_telegram_chat_id(), $riddle_deeplink_url,
-                QUIZ_CREATED_OK . $new_riddle_data[1]);
+                QUIZ_CREATED_OK . $new_riddle_data[1] . $new_riddle_data[0]);
         }
         else {
             $context->reply(QUIZ_ALREADY_OPEN);
