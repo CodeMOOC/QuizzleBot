@@ -7,17 +7,21 @@
  * Text strings.
  */
 
-const QUIZ_CREATED_OK = "Nuovo quiz attivo.";
+const QUIZ_CREATED_OK = "Nuovo quiz attivo. Codice: ";
 const QUIZ_ALREADY_OPEN = "Quiz già attivo: all'invio della risposta corretta il quiz corrente viene chiuso e le risposte vengono consegnate.";
 
 const COMMAND_HELP = "Ciao, sono un semplice bot per gestire dei quiz. Se ci sono quiz attivi puoi registrare direttamente la tua risposta qui, scrivendomi. Quando il quiz verrà chiuso, ti scriverò la risposta corretta e terrò traccia del tuo punteggio!";
 
 const ANSWER_NO_QUIZ = "Non ci sono quiz attivi al momento.";
 const ANSWER_NO_QUIZ_ADMIN = "Attiva un nuovo quiz col comando /new.";
-const ANSWER_CORRECT = "Giusto! La tua risposta è stata la %INDEX%° ad essere registrata. 👍";
+const ANSWER_CORRECT = "Giusto! Hai risposto correttamente come il %PERCENT_CORRECT%% di partecipanti. 👍";
 const ANSWER_WRONG = "Sbagliato! La risposta corretta era “%CORRECT_ANSWER%”. 😞";
 
 const ANSWER_ACCEPTED = "Ok, ho registrato la tua risposta.";
+
+const START_UNKNOWN_PAYLOAD = "Ops, non conosco questo codice."
+const START_ALREADY_ANSWERED = "Hai già risposto a questo quesito (la tua risposta è “%ANSWER%”).";
+const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const COMMAND_UNKNOWN = "Comando non riconosciuto.";
 
