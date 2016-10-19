@@ -36,7 +36,7 @@ function process_command($context, $text) {
     else if($command === 'reset' && $context->is_abmin()) {
         reset_db();
 
-        $context->reply("All is forgotten.");
+        $context->reply(RESET_OK);
 
         return true;
     }

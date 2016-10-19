@@ -23,6 +23,8 @@ const START_UNKNOWN_PAYLOAD = "Ops, non conosco questo codice.";
 const START_ALREADY_ANSWERED = "Hai già risposto a questo quesito (la tua risposta è “%ANSWER%”).";
 const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
+const RESET_OK = "All is forgotten.";
+
 const COMMAND_UNKNOWN = "Comando non riconosciuto.";
 
 const MESSAGE_NOT_SUPPORTED = "Eh? Usa il comando /help per avere informazioni.";
