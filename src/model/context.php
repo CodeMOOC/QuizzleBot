@@ -85,4 +85,24 @@ class Context {
         );
     }
 
+    /**
+     * Sends message to a known telegram chat by ID.
+     */
+    function send($telegram_id, $message, $additional_values = null) {
+        $hydration_values = array(
+            // TODO: get known values from DB
+        );
+
+        $hydrated = hydrate($message, unite_arrays($hydration_values, $additional_values));
+
+        return telegram_send_message(
+            $telegram_id,
+            $hydrated,
+            array(
+                'parse_mode' => 'HTML',
+                'disable_web_page_preview' => true
+            )
+        );
+    }
+
 }
