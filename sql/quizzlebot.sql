@@ -60,7 +60,7 @@ CREATE TABLE `riddle` (
   `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `end_time` timestamp NULL DEFAULT NULL,
   `answer` tinytext CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-  `salt` varchar(5) COLLATE utf8_bin NOT NULL,
+  `salt` char(2) COLLATE utf8_bin NOT NULL,
   `channel_message_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
