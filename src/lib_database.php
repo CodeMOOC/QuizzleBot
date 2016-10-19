@@ -39,10 +39,12 @@ function get_riddle_by_code($riddle_code) {
  * Open a new riddle returning the new riddle Id.
  * @return Int New riddle ID.
  */
-function open_riddle() {
+function open_riddle($channel_message_id = NULL) {
     $salt = generate_random_salt();
 
-    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}', NULL) ");
+    $channel_message_id_db = is_null($channel_message_id) ? 'NULL' : "'" . db_escape($channel_message_id) . "'";
+
+    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}', {$channel_message_id_db}) ");
 
     return $riddle_id;
 }
