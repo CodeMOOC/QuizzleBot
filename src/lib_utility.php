@@ -40,7 +40,7 @@ function extract_command($text = '') {
  * @return string Command payload, if any, or empty string.
  */
 function extract_command_payload($text = '') {
-    return mb_ereg_replace("/^\/([a-zA-Z0-9_]*)( |$)/", '', $text);
+    return mb_ereg_replace("^\/([a-zA-Z0-9_]*)( |$)", '', $text);
 }
 
 /**
