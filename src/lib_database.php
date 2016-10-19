@@ -202,7 +202,7 @@ function get_identity($telegram_user_id, $first_name, $full_name) {
  * @return bool|int
  */
 function change_identity_group_name($telegram_id, $group_name = NULL) {
-    $group_name_db = is_null($group_name)? 'NULL': "'$group_name'";
+    $group_name_db = is_null($group_name) ? 'NULL' : "'" . db_escape($group_name) . "'";
 
     return db_perform_action("UPDATE `identity` SET `group_name` = {$group_name_db} WHERE `identity`.`telegram_id` = {$telegram_id}");
 }
@@ -265,15 +265,6 @@ function set_identity_registering_status($telegram_id) {
     return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_REGISTERING]);
 }
 
-/**
- * Returns the identity record.
- *
- * @param $telegram_id
- * @return array
- */
-function get_identity($telegram_id) {
-    return db_row_query("SELECT * FROM `identity` WHERE `telegram_id` = {$telegram_id}");
-}
 
 
 //STATS
