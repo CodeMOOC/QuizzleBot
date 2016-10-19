@@ -53,7 +53,7 @@ function process_status($context, $text) {
             return true;
 
         case IDENTITY_STATUS_REG_NAME:
-            $clean_name = extract_response($text);
+            $clean_name = trim_response($text);
             if(strlen($clean_name) < 3) {
                 $context->reply(REGISTER_INVALID_NAME);
             }

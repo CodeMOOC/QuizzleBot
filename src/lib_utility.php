@@ -51,7 +51,11 @@ function extract_response($text) {
         return '';
     }
 
-    return mb_strtolower(trim($text, ' /,.!?;:\'"'));
+    return mb_strtolower(trim_response($text));
+}
+
+function trim_response($text) {
+    return trim($text, ' /,.!?;:\'"');
 }
 
 /**
