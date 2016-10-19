@@ -19,6 +19,7 @@ function process_text_message($context, $text) {
     }
 
     $current_riddle_id = $context->get_current_riddle_id();
+    Logger::debug("Current riddle ID: {$current_riddle_id}", __FILE__, $context);
     if($current_riddle_id === null) {
         $context->reply(ANSWER_NO_QUIZ);
         if($context->is_abmin()) {

@@ -29,8 +29,8 @@ function get_riddle($riddle_id) {
  * @return array Full riddle row.
  */
 function get_riddle_by_code($riddle_code) {
-    $riddle_salt = substr($riddle_code,0,3);
-    $riddle_id = substr($riddle_code,3);
+    $riddle_salt = substr($riddle_code, 0, 3);
+    $riddle_id = substr($riddle_code, 3);
     return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id} AND `salt` = '{$riddle_salt}'");
 }
 

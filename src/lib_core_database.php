@@ -259,13 +259,10 @@ const RIDDLE_ANSWER             = 3;
 const RIDDLE_SALT               = 4;
 const RIDDLE_CHANNEL_MESSAGE_ID = 5;
 
-
-
 const ANSWER_TELEGRAM_ID    = 0;
 const ANSWER_RIDDLE_ID      = 1;
 const ANSWER_TEXT           = 2;
 const ANSWER_LAST_UPDATE    = 3;
-
 
 const IDENTITY_TELEGRAM_ID          = 0;
 const IDENTITY_FIRST_NAME           = 1;
@@ -275,11 +272,6 @@ const IDENTITY_STATUS               = 4;
 const IDENTITY_RIDDLE_ID            = 5;
 const IDENTITY_PARTICIPANTS_COUNT   = 6;
 
-
-
 const IDENTITY_STATUS_DEFAULT       = 0;
 const IDENTITY_STATUS_ANSWERING     = 1;
 const IDENTITY_STATUS_REGISTERING   = 2;
-
-
-?>
