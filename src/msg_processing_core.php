@@ -57,6 +57,13 @@ function process_text_message($context, $text) {
         try {
             close_riddle($current_riddle_id, $text);
 
+            telegram_send_message(LIVE_CHANNEL_ID, hydrate(CHANNEL_CORRECT_ANSWER, array(
+                '%ANSWER%' => $text
+            )), array(
+                'parse_mode' => 'HTML',
+                'disable_web_page_preview' => true
+            ));
+
             $riddle_info = get_riddle($current_riddle_id);
             if($riddle_info[RIDDLE_CHANNEL_MESSAGE_ID]) {
                 $riddle_stats = get_riddle_current_stats($current_riddle_id);
