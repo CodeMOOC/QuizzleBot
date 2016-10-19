@@ -114,27 +114,28 @@ function is_riddle_closed($riddle_id) {
  * @return array
  */
 function get_answer($telegram_id, $riddle_id) {
-    return  db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = {$telegram_id} AND `riddle_id` = {$riddle_id} ORDER BY answer.last_update DESC" );
+    return db_row_query("SELECT * FROM `answer` WHERE `telegram_id` = {$telegram_id} AND `riddle_id` = {$riddle_id}");
 }
 
 /**
- * Checks whether the answer (identified by $telegram_id, $riddle_id) is correct.
+ * Gets information about an answer (identified by $telegram_id, $riddle_id).
  *
- * @param $user_id
- * @param $riddle_id
- * @return bool
- * @throws ErrorException if the riddle is still open.
+ * @param $telegram_id Telegram ID of the answering user.
+ * @param $riddle_id Riddle ID.
+ * @return array Correctness boolean, correct answer.
  */
-function is_answer_correct($telegram_id, $riddle_id) {
-    $answer_row = get_answer($telegram_id, $riddle_id);
-
-    if(is_riddle_closed($answer_row[ANSWER[ANSWER_RIDDLE_ID]]) === false){
-        throw new ErrorException('Riddle still open');
+function get_answer_info($telegram_id, $riddle_id, $answer_text = null) {
+    if($answer_text === null) {
+        $answer_text = get_answer($telegram_id, $riddle_id)[ANSWER_TEXT];
     }
 
-    $riddle_row = get_riddle($answer_row[ANSWER[ANSWER_RIDDLE_ID]]);
+    $riddle_row = get_riddle($riddle_id);
+    $is_correct = strcasecmp($riddle_row[RIDDLE_ANSWER], extract_response($answer_text)) === 0;
 
-    return strcasecmp (trim($riddle_row[RIDDLE[RIDDLE_ANSWER]]), trim($answer_row[ANSWER[ANSWER_TEXT]])) == 0;
+    return array(
+        $is_correct,
+        $riddle_row[RIDDLE_ANSWER]
+    );
 }
 
 /**
