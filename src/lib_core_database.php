@@ -243,17 +243,28 @@ function db_escape($s) {
     return mysqli_real_escape_string(db_open_connection(true), (string)$s);
 }
 
+
+/**
+ * Returns a random alphanumeric string 3-characters long
+ * @return string
+ */
+function generate_random_salt(){
+    return substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789') , 0 , 3 );
+}
+
 const RIDDLE_ID             = 0;
 const RIDDLE_START_TIME     = 1;
 const RIDDLE_ENS_TIME       = 2;
 const RIDDLE_ANSWER         = 3;
+const RIDDLE_SALT           = 4;
 
 
 const RIDDLE             = array(
     RIDDLE_ID,
     RIDDLE_START_TIME,
     RIDDLE_ENS_TIME,
-    RIDDLE_ANSWER
+    RIDDLE_ANSWER,
+    RIDDLE_SALT
 );
 
 const ANSWER_TELEGRAM_ID    = 0;
@@ -267,7 +278,5 @@ const ANSWER             = array(
     ANSWER_TEXT,
     ANSWER_LAST_UPDATE
 );
-
-
 
 ?>

@@ -101,4 +101,12 @@ function is_guid($text) {
     return preg_match('/^\{?[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\}?$/', $text) > 0;
 }
 
+function generate_qr_code_url($code) {
+
+    $deeplink_base_url = rawurlencode(TELEGRAM_DEEP_LINK_URI_BASE);
+
+    return "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=$deeplink_base_url$code&choe=UTF-8";
+}
+
+
 ?>
