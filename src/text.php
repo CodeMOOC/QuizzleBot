@@ -26,6 +26,7 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 const RESET_OK = "All is forgotten.";
 
 const CHANNEL_NEW_RIDDLE = "Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
+const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b>\nPartecipanti: <b>%TOTAL_PARTICIPANTS%</b>\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
 
 const COMMAND_UNKNOWN = "Comando non riconosciuto.";
 
