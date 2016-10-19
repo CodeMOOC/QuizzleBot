@@ -12,13 +12,14 @@ require_once('lib.php');
 require_once('msg_processing_commands.php');
 
 function process_text_message($context, $text) {
-    Logger::debug("Processing text '{$text}', last open riddle ID {$context->get_last_open_riddle_id()}", __FILE__, $context);
+    Logger::debug("Processing text '{$text}'", __FILE__, $context);
 
     if(process_command($context, $text)) {
         return;
     }
 
-    if($context->get_last_open_riddle_id() === null) {
+    $current_riddle_id = $context->get_current_riddle_id();
+    if($current_riddle_id === null) {
         $context->reply(ANSWER_NO_QUIZ);
         if($context->is_abmin()) {
             $context->reply(ANSWER_NO_QUIZ_ADMIN);
@@ -29,22 +30,9 @@ function process_text_message($context, $text) {
     if($context->is_abmin()) {
         // Correct answer given
         try {
-            $stats = close_riddle($context->get_last_open_riddle_id(), $text);
+            $stats = close_riddle($current_riddle_id, $text);
 
-            $i = 1;
-            foreach($stats as $answer) {
-                echo "{$answer[0]} answer is {$answer[1]}" . PHP_EOL;
-
-                $add_values = array(
-                    '%INDEX%' => $i,
-                    '%CORRECT_ANSWER%' => $text
-                );
-                $context->send($answer[0], ($answer[1]) ? ANSWER_CORRECT : ANSWER_WRONG, $add_values);
-
-                ++$i;
-
-                usleep(1000000 / 40); // 40 messages per second primitive rate limiting
-            }
+            // TODO: notify on channel
         }
         catch(exception $e) {
             $context->reply("Failure");
@@ -52,7 +40,22 @@ function process_text_message($context, $text) {
     }
     else {
         // User answer given
-        insert_answer($context->get_message()->from_id, $text, $last_open_riddle_id);
+        insert_answer($context->get_telegram_user_id(), $current_riddle_id, $text);
+
+        if(is_riddle_closed($current_riddle_id)) {
+            $answer_info = get_answer_info($context->get_telegram_user_id(), $current_riddle_id, $text);
+
+            $context->reply(
+                ($answer_info[0]) ? ANSWER_CORRECT : ANSWER_WRONG,
+                array(
+                    '%CORRECT_ANSWER%' => $answer_info[1],
+                    '%PERCENT_CORRECT%' => '100'
+                )
+            );
+        }
+        else {
+
+        }
 
         $context->reply(ANSWER_ACCEPTED);
         return;

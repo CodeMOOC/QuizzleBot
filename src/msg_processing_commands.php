@@ -15,7 +15,8 @@ function process_command($context, $text) {
     $command = extract_command($text);
 
     if($command === 'new' && $context->is_abmin()) {
-        if($context->get_last_open_riddle_id() === null) {
+        $last_open_riddle = get_last_open_riddle_id();
+        if($last_open_riddle === null) {
             // New question!
             $new_riddle_id = open_riddle();
 
