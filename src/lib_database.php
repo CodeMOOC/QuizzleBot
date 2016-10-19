@@ -265,16 +265,6 @@ function set_identity_registering_status($telegram_id) {
     return change_identity_status($telegram_id, IDENTITY_STATUS_TYPE[IDENTITY_STATUS_REGISTERING]);
 }
 
-/**
- * Returns the identity record.
- *
- * @param $telegram_id
- * @return array
- */
-function get_identity($telegram_id) {
-    return db_row_query("SELECT * FROM `identity` WHERE `telegram_id` = {$telegram_id}");
-}
-
 //DB
 
 /**
