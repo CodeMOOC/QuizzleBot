@@ -25,6 +25,8 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const RESET_OK = "All is forgotten.";
 
+const CHANNEL_NEW_RIDDLE = "Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
+
 const COMMAND_UNKNOWN = "Comando non riconosciuto.";
 
 const MESSAGE_NOT_SUPPORTED = "Eh? Usa il comando /help per avere informazioni.";

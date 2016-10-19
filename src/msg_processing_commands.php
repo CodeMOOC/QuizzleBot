@@ -19,11 +19,22 @@ function process_command($context, $text) {
         if($last_open_riddle === null) {
             // New question!
             $new_riddle_data = open_riddle();
-
             Logger::info("New riddle ID: {$new_riddle_data[0]}", __FILE__, $context);
 
-            $riddle_deeplink_url = get_riddle_qrcode_url($new_riddle_data[0]);
+            // Notify on channel
+            $channel_result = telegram_send_message(LIVE_CHANNEL_ID, hydrate(CHANNEL_NEW_RIDDLE, array(
+                '%PAYLOAD%' => $new_riddle_data[1] . $new_riddle_data[0]
+            )), array(
+                'parse_mode' => 'HTML',
+                'disable_web_page_preview' => true
+            ));
+            $channel_msg_id = $channel_result['message_id'];
+            Logger::debug("Channel message ID {$channel_msg_id}", __FILE__, $context);
 
+            set_riddle_channel_message_id($new_riddle_data[0], $channel_msg_id);
+
+            // Send QR Code deep link
+            $riddle_deeplink_url = get_riddle_qrcode_url($new_riddle_data[0]);
             telegram_send_photo($context->get_telegram_chat_id(), $riddle_deeplink_url,
                 QUIZ_CREATED_OK . $new_riddle_data[1] . $new_riddle_data[0]);
         }
