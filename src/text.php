@@ -15,7 +15,7 @@ const COMMAND_HELP = "Ciao, sono un semplice bot per gestire dei quiz. Se ci son
 const ANSWER_NO_QUIZ = "Digita il codice del quiz per partecipare (oppure scansiona il QR Code).";
 const ANSWER_NO_QUIZ_ADMIN = "Nessun quiz attivo. Attiva un nuovo quiz col comando /new.";
 const ANSWER_CORRECT = "<b>Giusto!</b> Hai risposto correttamente come il %PERCENT_CORRECT%% di partecipanti. 👍";
-const ANSWER_WRONG = "<b>Sbagliato!</b> La risposta corretta era “%CORRECT_ANSWER%”. 😞";
+const ANSWER_WRONG = "<b>Sbagliato!</b> La risposta corretta era “%CORRECT_ANSWER%”. 😞 (Il %PERCENT_CORRECT% dei partecipanti ha risposto correttamente.)";
 
 const ANSWER_ACCEPTED = "Ok, ho registrato la tua risposta. Vedi il risultato sul canale @" . LIVE_CHANNEL_ID . ".";
 

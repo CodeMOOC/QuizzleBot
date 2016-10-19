@@ -55,7 +55,7 @@ function process_text_message($context, $text) {
     if($context->is_abmin()) {
         // Correct answer given
         try {
-            $stats = close_riddle($current_riddle_id, $text);
+            close_riddle($current_riddle_id, $text);
 
             // TODO: notify on channel
         }
@@ -74,7 +74,7 @@ function process_text_message($context, $text) {
                 ($answer_info[0]) ? ANSWER_CORRECT : ANSWER_WRONG,
                 array(
                     '%CORRECT_ANSWER%' => $answer_info[1],
-                    '%PERCENT_CORRECT%' => '100'
+                    '%PERCENT_CORRECT%' => $answer_info[2]
                 )
             );
         }
