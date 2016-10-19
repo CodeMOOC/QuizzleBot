@@ -62,11 +62,11 @@ function get_riddle_qrcode_url($riddle_id) {
 }
 
 /**
- * Closes a riddle then returns ordered riddle stats (telegram_id, success).
+ * Closes a riddle.
  *
  * @param $riddle_id Int Riddle ID.
  * @param $text String Answer string.
- * @return array Answer stats of the closed riddle.
+ * @return int|bool
  */
 function close_riddle($riddle_id, $text) {
     if(is_riddle_closed($riddle_id)){
@@ -75,15 +75,22 @@ function close_riddle($riddle_id, $text) {
 
     $clean_text = db_escape(extract_response($text));
 
-    db_perform_action("START TRANSACTION");
+    return db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '{$clean_text}', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = {$riddle_id}");
+}
 
-    db_perform_action("UPDATE `riddle` SET `riddle`.`answer` = '{$clean_text}', `riddle`.`end_time` = CURRENT_TIMESTAMP WHERE `riddle`.`id` = {$riddle_id}");
+/**
+ * Returns the ordered riddle stats (telegram_id, name).
+ *
+ * @param $riddle_id Int Riddle ID.
+ * @return array Answer stats of the closed riddle.
+ */
+function get_riddle_topten($riddle_id) {
 
-    $stats = db_table_query("SELECT `answer`.`telegram_id` as telegram_id, `riddle`.`answer` = `answer`.`text` as success FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` IS NOT NULL ORDER BY success DESC, `answer`.`last_update` ASC");
+    if(!is_riddle_closed($riddle_id)){
+        throw new ErrorException('Riddle still closed');
+    }
 
-    db_perform_action("COMMIT");
-
-    return $stats;
+    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` )  FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT 10");
 }
 
 /**
