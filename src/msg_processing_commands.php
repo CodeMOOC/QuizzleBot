@@ -18,11 +18,14 @@ function process_command($context, $text) {
         $last_open_riddle = get_last_open_riddle_id();
         if($last_open_riddle === null) {
             // New question!
-            $new_riddle_id = open_riddle();
+            $new_riddle_data = open_riddle();
 
-            Logger::info("New riddle ID: {$new_riddle_id}", __FILE__, $context);
+            Logger::info("New riddle ID: {$new_riddle_data[0]}", __FILE__, $context);
 
-            $context->reply(QUIZ_CREATED_OK);
+            $riddle_deeplink_url = get_riddle_qrcode_url($new_riddle_data[0]);
+
+            telegram_send_photo($context->get_telegram_chat_id(), $riddle_deeplink_url,
+                QUIZ_CREATED_OK . $new_riddle_data[1]);
         }
         else {
             $context->reply(QUIZ_ALREADY_OPEN);
