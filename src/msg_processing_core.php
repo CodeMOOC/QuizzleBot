@@ -57,37 +57,37 @@ function process_text_message($context, $text) {
         try {
             close_riddle($current_riddle_id, $text);
 
-            telegram_send_message(LIVE_CHANNEL_ID, hydrate(CHANNEL_CORRECT_ANSWER, array(
-                '%ANSWER%' => $text
-            )), array(
-                'parse_mode' => 'HTML',
-                'disable_web_page_preview' => true
-            ));
-
             $riddle_info = get_riddle($current_riddle_id);
             if($riddle_info[RIDDLE_CHANNEL_MESSAGE_ID]) {
-                $riddle_stats = get_riddle_current_stats($current_riddle_id);
-                $riddle_top = get_riddle_topten($current_riddle_id);
-
-                // Post to channel
-                $channel_text = hydrate(CHANNEL_FINAL, array(
-                    '%CODE%' => $riddle_info[RIDDLE_SALT] . $riddle_info[RIDDLE_ID],
-                    '%TOTAL_COUNT%' => $riddle_stats[0],
-                    '%TOTAL_PARTICIPANTS%' => $riddle_stats[1],
-                    '%PERCENT_CORRECT%' => $riddle_stats[2]
-                ));
-                if(count($riddle_top) > 0)
-                    $channel_text .= "\n🥇 {$riddle_top[0][1]}";
-                if(count($riddle_top) > 1)
-                    $channel_text .= "\n🥈 {$riddle_top[1][1]}";
-                if(count($riddle_top) > 2)
-                    $channel_text .= "\n🥉 {$riddle_top[2][1]}";
-
-                telegram_edit_message(LIVE_CHANNEL_ID, $riddle_info[RIDDLE_CHANNEL_MESSAGE_ID], $channel_text, array(
+                telegram_edit_message(LIVE_CHANNEL_ID, $riddle_info[RIDDLE_CHANNEL_MESSAGE_ID], hydrate(CHANNEL_CORRECT_ANSWER, array(
+                    '%ANSWER%' => $text
+                )), array(
                     'parse_mode' => 'HTML',
                     'disable_web_page_preview' => true
                 ));
             }
+
+            $riddle_stats = get_riddle_current_stats($current_riddle_id);
+            $riddle_top = get_riddle_topten($current_riddle_id);
+
+            // Post to channel
+            $channel_text = hydrate(CHANNEL_FINAL, array(
+                '%CODE%' => $riddle_info[RIDDLE_SALT] . $riddle_info[RIDDLE_ID],
+                '%TOTAL_COUNT%' => $riddle_stats[0],
+                '%TOTAL_PARTICIPANTS%' => $riddle_stats[1],
+                '%PERCENT_CORRECT%' => $riddle_stats[2]
+            ));
+            if(count($riddle_top) > 0)
+                $channel_text .= "\n🥇 {$riddle_top[0][1]}";
+            if(count($riddle_top) > 1)
+                $channel_text .= "\n🥈 {$riddle_top[1][1]}";
+            if(count($riddle_top) > 2)
+                $channel_text .= "\n🥉 {$riddle_top[2][1]}";
+
+            telegram_send_message(LIVE_CHANNEL_ID, $channel_text, array(
+                'parse_mode' => 'HTML',
+                'disable_web_page_preview' => true
+            ));
         }
         catch(exception $e) {
             $context->reply("Failure");

@@ -23,7 +23,7 @@ const START_UNKNOWN_PAYLOAD = "Ops, non riconosco questo codice. 😕\nDigita il
 const START_ALREADY_ANSWERED = "Hai già risposto a questo quesito (la tua prima risposta era “%ANSWER%”).";
 const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
-const RESET_OK = "All is forgotten.";
+const RESET_OK = "Tutto dimenticato.";
 
 const CHANNEL_NEW_RIDDLE = "Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
 const CHANNEL_NEW_RIDDLE = "📢 Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
