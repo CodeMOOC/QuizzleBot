@@ -7,7 +7,8 @@
  * Database support library. Don't change a thing here.
  */
 
-require_once ('lib_core_database.php');
+require_once('lib_core_database.php');
+require_once('lib_utility.php');
 
 //RIDDLES
 
@@ -182,7 +183,7 @@ function get_identity($telegram_user_id, $first_name, $full_name) {
     $identity = db_row_query("SELECT `group_name`, `participants_count`, `status`, `riddle_id` FROM `identity` WHERE `telegram_id` = {$telegram_user_id}");
     if($identity === null) {
         // New user
-        db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT)");
+        db_perform_action("INSERT INTO `identity` VALUES({$telegram_user_id}, '{$clean_first_name}', '{$clean_full_name}', DEFAULT, DEFAULT, DEFAULT, DEFAULT)");
 
         return array(null, 1, IDENTITY_STATUS_DEFAULT, null);
     }
