@@ -279,4 +279,22 @@ const ANSWER             = array(
     ANSWER_LAST_UPDATE
 );
 
+const IDENTITY_TELEGRAM_ID          = 0;
+const IDENTITY_FIRST_NAME           = 1;
+const IDENTITY_FULL_NAME            = 2;
+const IDENTITY_GROUP_NAME           = 3;
+const IDENTITY_PARTICIPANTS_COUNT   = 4;
+const IDENTITY_STATUS               = 5;
+const IDENTITY_RIDDLE_ID            = 6;
+
+const IDENTITY             = array(
+    IDENTITY_TELEGRAM_ID,
+    IDENTITY_FIRST_NAME,
+    IDENTITY_FULL_NAME,
+    IDENTITY_GROUP_NAME,
+    IDENTITY_PARTICIPANTS_COUNT,
+    IDENTITY_STATUS,
+    IDENTITY_RIDDLE_ID
+);
+
 ?>

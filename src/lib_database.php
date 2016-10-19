@@ -137,11 +137,17 @@ function insert_answer($telegram_id, $text, $riddle_id = null) {
     throw new ErrorException('No open riddles');
 }
 
-//RESET DB
+
+//DB
+
+/**
+ * Completely wipes out the DB data.
+ */
 function reset_db() {
 
     db_perform_action("START TRANSACTION;");
     db_perform_action("TRUNCATE answer");
+    db_perform_action("TRUNCATE identity");
     db_perform_action("DELETE FROM riddle");
     db_perform_action("ALTER TABLE riddle AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");

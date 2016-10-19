@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Oct 19, 2016 at 12:12 PM
+-- Generation Time: Oct 19, 2016 at 02:08 PM
 -- Server version: 5.5.46-0+deb8u1
 -- PHP Version: 5.6.17-0+deb8u1
 
@@ -36,17 +36,16 @@ CREATE TABLE `answer` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `indentity`
+-- Table structure for table `identity`
 --
 
-CREATE TABLE `indentity` (
+CREATE TABLE `identity` (
   `telegram_id` int(11) UNSIGNED NOT NULL,
   `first_name` varchar(128) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `full_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `group_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
-  `participants_count` int(11) NOT NULL DEFAULT '1',
-  `status` int(11) NOT NULL DEFAULT '0',
-  `riddle_id` int(11) DEFAULT NULL
+  `group_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `status` int(11) NOT NULL,
+  `riddle_id` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -60,8 +59,7 @@ CREATE TABLE `riddle` (
   `start_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `end_time` timestamp NULL DEFAULT NULL,
   `answer` tinytext CHARACTER SET utf8 COLLATE utf8_unicode_ci,
-  `salt` varchar(5) COLLATE utf8_bin NOT NULL,
-  `qrcode_path` varchar(4096) COLLATE utf8_bin DEFAULT NULL
+  `salt` varchar(5) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
@@ -73,13 +71,15 @@ CREATE TABLE `riddle` (
 --
 ALTER TABLE `answer`
   ADD PRIMARY KEY (`telegram_id`,`riddle_id`) USING BTREE,
-  ADD KEY `riddle_id_index` (`riddle_id`) USING BTREE;
+  ADD KEY `riddle_id_index` (`riddle_id`) USING BTREE,
+  ADD KEY `telegram_id_index` (`telegram_id`) USING BTREE;
 
 --
--- Indexes for table `indentity`
+-- Indexes for table `identity`
 --
-ALTER TABLE `indentity`
-  ADD PRIMARY KEY (`telegram_id`);
+ALTER TABLE `identity`
+  ADD PRIMARY KEY (`telegram_id`),
+  ADD KEY `riddle_id` (`riddle_id`);
 
 --
 -- Indexes for table `riddle`
@@ -104,6 +104,7 @@ ALTER TABLE `riddle`
 -- Constraints for table `answer`
 --
 ALTER TABLE `answer`
+  ADD CONSTRAINT `telegram_id_fkey` FOREIGN KEY (`telegram_id`) REFERENCES `identity` (`telegram_id`),
   ADD CONSTRAINT `riddle_id_fkey` FOREIGN KEY (`riddle_id`) REFERENCES `riddle` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
