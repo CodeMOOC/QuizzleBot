@@ -29,7 +29,7 @@ function get_riddle($riddle_id) {
  */
 function get_riddle_by_code($riddle_code) {
 
-    $riddle_salt = substr($riddle_code,0,2);
+    $riddle_salt = substr($riddle_code,0,3);
     $riddle_id = substr($riddle_code,3);
 
     return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id} AND `salt` = '{$riddle_salt}'");
@@ -109,7 +109,7 @@ function get_last_open_riddle_id() {
  * @return bool True if the riddle is closed.
  */
 function is_riddle_closed($riddle_id) {
-    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE id = {$riddle_id}") === 1;
+    return db_scalar_query("SELECT IF(`answer` IS NULL, '0', '1') FROM `riddle` WHERE `id` = {$riddle_id}") == 1;
 }
 
 /**
