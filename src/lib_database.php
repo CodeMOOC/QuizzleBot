@@ -30,7 +30,7 @@ function get_riddle($riddle_id) {
  */
 function get_riddle_by_code($riddle_code) {
     $riddle_salt = mb_strtoupper(substr($riddle_code, 0, 2));
-    $riddle_id = substr($riddle_code, 2);
+    $riddle_id = intval(substr($riddle_code, 2));
     return db_row_query("SELECT * FROM `riddle` WHERE `id` = {$riddle_id} AND `salt` = '{$riddle_salt}'");
 }
 
