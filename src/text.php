@@ -10,7 +10,7 @@
 const QUIZ_CREATED_OK = "Nuovo quiz attivo. Codice: ";
 const QUIZ_ALREADY_OPEN = "Quiz già attivo: all'invio della risposta corretta il quiz corrente viene chiuso e le risposte vengono consegnate.";
 
-const COMMAND_HELP = "Ciao, sono un semplice bot per gestire dei quiz. Se ci sono quiz attivi puoi registrare direttamente la tua risposta qui, scrivendomi. Quando il quiz verrà chiuso, ti scriverò la risposta corretta e terrò traccia del tuo punteggio!";
+const COMMAND_HELP = "Ciao, sono <b>Quizzle</b>, un bot che gestisce dei quiz multiutente. Puoi registrarti come gruppo col comando /register. Se ci sono quiz attivi, avrai ricevuto un codice o un <i>QR Code</i> che puoi utilizzare per rispondere. Ti informerò delle risposte corrette e dei risultati.\n\nIl mio codice è <a href=\"https://github.com/CodeMOOC/QuizzleBot\">disponibile su Github</a>.";
 
 const ANSWER_NO_QUIZ = "Digita il codice del quiz per partecipare (oppure scansiona il QR Code).";
 const ANSWER_NO_QUIZ_ADMIN = "Nessun quiz attivo. Attiva un nuovo quiz col comando /new.";
@@ -25,9 +25,9 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const RESET_OK = "Tutto dimenticato.";
 
-const REGISTER_QUERY_CONFIRM = "Ok, vuoi che ti registri come gruppo?";
+const REGISTER_QUERY_CONFIRM = "Vuoi che ti registri come gruppo?";
 const REGISTER_AFFIRMATIVE = array('si', 'sì', 'ok', 'certo', 'va bene', 'bene');
-const REGISTER_QUERY_NAME = "Certo, %FIRST_NAME%. Qual è il nome del tuo gruppo?";
+const REGISTER_QUERY_NAME = "Ok, %FIRST_NAME%. Qual è il nome del tuo gruppo?";
 const REGISTER_QUERY_PARTICIPANTS = "In quanti siete? (Incluso te.)";
 const REGISTER_QUERY_OK = "Perfetto. 👍";
 const REGISTER_RESET= "Ok, %FIRST_NAME%. Ti considererò come giocatore individuale.";
