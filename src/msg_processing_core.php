@@ -11,6 +11,27 @@ require_once('model/context.php');
 require_once('lib.php');
 require_once('msg_processing_commands.php');
 
+function switch_to_riddle($context, $code) {
+    $riddle_info = get_riddle_by_code($code);
+    if($riddle_info === null) {
+        $context->reply(START_UNKNOWN_PAYLOAD);
+        return;
+    }
+
+    $riddle_id = $riddle_info[0];
+    $prev_answer = get_answer($context->get_telegram_user_id(), $riddle_id);
+    if($prev_answer !== null) {
+        $context->reply(START_ALREADY_ANSWERED, array(
+            '%ANSWER%' => $prev_answer[ANSWER_TEXT]
+        ));
+        return;
+    }
+
+    set_identity_answering_status($context->get_telegram_user_id(), $riddle_id);
+
+    $context->reply(START_RECOGNIZED);
+}
+
 function process_text_message($context, $text) {
     Logger::debug("Processing text '{$text}'", __FILE__, $context);
 
@@ -20,11 +41,14 @@ function process_text_message($context, $text) {
 
     $current_riddle_id = $context->get_current_riddle_id();
     Logger::debug("Current riddle ID: {$current_riddle_id}", __FILE__, $context);
+
     if($current_riddle_id === null) {
-        $context->reply(ANSWER_NO_QUIZ);
         if($context->is_abmin()) {
             $context->reply(ANSWER_NO_QUIZ_ADMIN);
+            return;
         }
+
+        switch_to_riddle($context, $text);
         return;
     }
 

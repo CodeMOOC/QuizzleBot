@@ -69,8 +69,12 @@ class Context {
             return $this->active_riddle_id;
         }
 
-        // Get last open riddle, if any
-        return get_last_open_riddle_id();
+        // Get last open riddle for admins
+        if($this->is_abmin()) {
+            return get_last_open_riddle_id();
+        }
+
+        return null;
     }
 
     /**
