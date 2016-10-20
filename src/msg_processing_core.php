@@ -85,6 +85,9 @@ function process_status($context, $text) {
             if($count <= 0) {
                 $context->reply(REGISTER_INVALID_COUNT);
             }
+            else if($count >= 500) {
+                $context->reply(REGISTER_TOO_HIGH_COUNT);
+            }
             else {
                 set_identity_default_status($context->get_telegram_user_id());
                 set_identity_participants_count($context->get_telegram_user_id(), $count);
