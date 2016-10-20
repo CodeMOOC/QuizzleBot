@@ -51,7 +51,8 @@ function extract_response($text) {
         return '';
     }
 
-    return mb_strtolower(trim_response($text));
+    $lower_response = mb_strtolower(trim_response($text));
+    return escape_accents($lower_response);
 }
 
 function trim_response($text) {
@@ -94,6 +95,14 @@ function unite_arrays($a, $b) {
  */
 function escape_markdown($text) {
     return mb_ereg_replace('([_*\[\]\(\)])', '\\\1', $text);
+}
+
+/**
+ * Escapes accents.
+ */
+function escape_accents($text)
+{
+    return preg_replace('~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml|caron);~i', '$1', htmlentities($text, ENT_QUOTES, 'UTF-8'));
 }
 
 /**
