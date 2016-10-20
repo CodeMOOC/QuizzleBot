@@ -271,7 +271,11 @@ function set_identity_answering_status($telegram_id, $riddle_id) {
 function get_riddle_success_rate($riddle_id) {
     $successes =  db_scalar_query("SELECT COUNT(*) FROM `answer` INNER JOIN `riddle` ON `answer`.`text` = `riddle`.`answer` WHERE `riddle`.`id` = {$riddle_id} AND `answer`.`riddle_id` = {$riddle_id}");
     $total =  db_scalar_query("SELECT COUNT(*) FROM `answer` WHERE `answer`.`riddle_id` = {$riddle_id}");
-    
+
+    if($total == 0) {
+        return 0;
+    }
+
     return intval(($successes * 100) / $total);
 
 }
