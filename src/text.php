@@ -9,6 +9,7 @@
 
 const QUIZ_CREATED_OK = "Nuovo quiz attivo. Codice: ";
 const QUIZ_ALREADY_OPEN = "Quiz già attivo: all'invio della risposta corretta il quiz corrente viene chiuso e le risposte vengono consegnate.";
+const QUIZ_NOT_ADMIN = "Non sei registrato come amministratore, spiacente. 😞";
 
 const COMMAND_HELP = "Ciao, sono <b>Quizzle</b>, un bot che gestisce dei quiz multiutente. Puoi registrarti come gruppo col comando /register. Se ci sono quiz attivi, avrai ricevuto un codice o un <i>QR Code</i> che puoi utilizzare per rispondere. Ti informerò delle risposte corrette e dei risultati.\n\nIl mio codice è <a href=\"https://github.com/CodeMOOC/QuizzleBot\">disponibile su Github</a>.";
 
@@ -32,7 +33,8 @@ const REGISTER_QUERY_PARTICIPANTS = "In quanti siete? (Incluso te.)";
 const REGISTER_QUERY_OK = "Perfetto. 👍";
 const REGISTER_RESET= "Ok, %FIRST_NAME%. Ti considererò come giocatore individuale.";
 const REGISTER_INVALID_NAME = "Non mi sembra un nome corretto.";
-const REGISTER_INVALID_COUNT = "Specifica il numero in cifre.";
+const REGISTER_INVALID_COUNT = "Specifica un numero valido in cifre.";
+const REGISTER_TOO_HIGH_COUNT = "Siete un po' troppi, secondo me…";
 
 const CHANNEL_NEW_RIDDLE = "📢 Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
 const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b> (👥 Partecipanti: <b>%TOTAL_PARTICIPANTS%</b>)\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
