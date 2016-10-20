@@ -313,6 +313,24 @@ function get_riddle_topten($riddle_id) {
 }
 
 
+/**
+ * Returns the overall topten of users as an array of (row) array where each row is composed by (number of right answers,user's name)
+ *
+ * @return array|bool
+ */
+function get_general_topten() {
+    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `answer`.`text` = `riddle`.`answer` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT 10");
+}
+
+/**
+ * The same as @see get_general_topten() but only considers the answers given before the riddle has ended.
+ *
+ * @return array
+ */
+function get_general_topten_in_time() {
+    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT 10");
+}
+
 //DB
 
 /**
