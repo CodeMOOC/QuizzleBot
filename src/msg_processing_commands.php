@@ -59,6 +59,7 @@ function process_command($context, $text) {
                 'keyboard' => array(
                     array('Sì', 'No')
                 ),
+                'resize_keyboard' => true,
                 'one_time_keyboard' => true
             )
         ));
