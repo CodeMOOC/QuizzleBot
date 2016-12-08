@@ -1,5 +1,6 @@
 config.php
 test.php
+**/pull-last-update.txt
 
 # Composer files
 composer.phar
