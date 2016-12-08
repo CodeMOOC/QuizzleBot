@@ -248,16 +248,17 @@ function db_escape($s) {
  * Returns a random alphanumeric string 3-characters long
  * @return string
  */
-function generate_random_salt(){
+function generate_random_salt() {
     return mb_strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2));
 }
 
 const RIDDLE_ID                 = 0;
-const RIDDLE_START_TIME         = 1;
-const RIDDLE_ENS_TIME           = 2;
-const RIDDLE_ANSWER             = 3;
-const RIDDLE_SALT               = 4;
-const RIDDLE_CHANNEL_MESSAGE_ID = 5;
+const RIDDLE_SESSION_ID         = 1;
+const RIDDLE_START_TIME         = 2;
+const RIDDLE_ENS_TIME           = 3;
+const RIDDLE_ANSWER             = 4;
+const RIDDLE_SALT               = 5;
+const RIDDLE_CHANNEL_MESSAGE_ID = 6;
 
 const ANSWER_TELEGRAM_ID    = 0;
 const ANSWER_RIDDLE_ID      = 1;
