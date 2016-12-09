@@ -47,11 +47,7 @@ function process_status($context, $text) {
             if(in_array(extract_response($text), REGISTER_AFFIRMATIVE)) {
                 change_identity_status($context->get_telegram_user_id(), IDENTITY_STATUS_REG_NAME);
 
-                $context->reply(REGISTER_QUERY_NAME, null, array(
-                    'reply_markup' => array(
-                        'hide_keyboard' => true
-                    )
-                ));
+                $context->reply(REGISTER_QUERY_NAME);
             }
             else {
                 // Reset to defaults
@@ -59,11 +55,7 @@ function process_status($context, $text) {
                 change_identity_group_name($context->get_telegram_user_id());
                 set_identity_participants_count($context->get_telegram_user_id());
 
-                $context->reply(REGISTER_RESET, null, array(
-                    'reply_markup' => array(
-                        'hide_keyboard' => true
-                    )
-                ));
+                $context->reply(REGISTER_RESET);
             }
             return true;
 

@@ -59,15 +59,7 @@ function process_command($context, $text) {
     else if($command === 'register') {
         change_identity_status($context->get_telegram_user_id(), IDENTITY_STATUS_REG_CONFIRM);
 
-        $context->reply(REGISTER_QUERY_CONFIRM, null, array(
-            'reply_markup'=> array(
-                'keyboard' => array(
-                    array('Sì', 'No')
-                ),
-                'resize_keyboard' => true,
-                'one_time_keyboard' => true
-            )
-        ));
+        $context->confirm(REGISTER_QUERY_CONFIRM);
 
         return true;
     }

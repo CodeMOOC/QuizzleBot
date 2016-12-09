@@ -112,9 +112,29 @@ class Context {
             $hydrated,
             unite_arrays(array(
                 'parse_mode' => 'HTML',
-                'disable_web_page_preview' => true
+                'disable_web_page_preview' => true,
+                // "Hide keyboard" is added by default to all messages because
+                // of a bug in Telegram that doesn't hide "one-time" keyboards after use
+                'reply_markup' => array(
+                    'hide_keyboard' => true
+                )
             ), $additional_parameters)
         );
+    }
+
+    /**
+     * Replies to the user asking for confirmation (yes/no).
+     */
+    function confirm($message, $additional_values = null) {
+        return $this->reply($message, $additional_values, array(
+            'reply_markup'=> array(
+                'keyboard' => array(
+                    array('Sì', 'No')
+                ),
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            )
+        ));
     }
 
     /**
