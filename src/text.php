@@ -39,6 +39,7 @@ const REGISTER_INVALID_COUNT = "Specifica un numero valido in cifre.";
 const REGISTER_TOO_HIGH_COUNT = "Siete un po' troppi, secondo me…";
 
 const CHANNEL_NEW_RIDDLE = "📢 Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK_URI_BASE . "%PAYLOAD%\">Rispondi al bot</a>.";
+const CHANNEL_NEW_RIDDLE_UPDATE = " (Risposte ricevute: <b>%ANSWERS%</b>)";
 const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b> (👥 Partecipanti: <b>%TOTAL_PARTICIPANTS%</b>)\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
 const CHANNEL_CORRECT_ANSWER = "La risposta corretta era “%ANSWER%”. ✅";
 

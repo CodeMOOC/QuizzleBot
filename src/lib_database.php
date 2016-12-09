@@ -356,6 +356,14 @@ function get_general_topten_in_time($session_id = null, $count = 10) {
     return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT {$count}");
 }
 
+/**
+ * Returns a matrix of open riddles.
+ * Tuples contain: ID, salt, start datetime, editable channel message id, count of registered answers.
+ */
+function get_open_riddles_with_count() {
+    return db_table_query("SELECT r.`id`, r.`salt`, r.`start_time`, r.`channel_message_id`, count(*) AS `count` FROM `riddle` AS r LEFT OUTER JOIN `answer` AS a ON r.`id` = a.`riddle_id` WHERE r.`end_time` IS NULL GROUP BY a.`riddle_id`");
+}
+
 // DB
 
 /**
