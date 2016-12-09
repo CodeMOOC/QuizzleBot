@@ -7,8 +7,8 @@
  * Database support library. Don't change a thing here.
  */
 
-require_once('lib_core_database.php');
-require_once('lib_utility.php');
+require_once(dirname(__FILE__) . '/lib_core_database.php');
+require_once(dirname(__FILE__) . '/lib_utility.php');
 
 // SESSIONS
 

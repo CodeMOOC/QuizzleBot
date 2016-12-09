@@ -8,7 +8,7 @@
  */
 
 
-require_once('lib.php');
+require_once(dirname(__FILE__) . '/lib.php');
 
 // Get input contents
 // Notice: we use php://stdin (the HTTP request body) normally, but switch

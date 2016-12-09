@@ -7,8 +7,8 @@
  * Logging library.
  */
 
-require_once('lib.php');
-require_once('model/context.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/model/context.php');
 
 // Register teardown upfront
 register_shutdown_function('Logger::logger_teardown');

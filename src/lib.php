@@ -7,11 +7,11 @@
  * Support library. Don't change a thing here.
  */
 
-require_once('log.php');
-require_once('config.php');
-require_once('lib_database.php');
-require_once('lib_utility.php');
-require_once('text.php');
+require_once(dirname(__FILE__) . '/log.php');
+require_once(dirname(__FILE__) . '/config.php');
+require_once(dirname(__FILE__) . '/lib_database.php');
+require_once(dirname(__FILE__) . '/lib_utility.php');
+require_once(dirname(__FILE__) . '/text.php');
 
 /**
  * Mixes together parameters for an HTTP request.

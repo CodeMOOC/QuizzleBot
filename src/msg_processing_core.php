@@ -7,9 +7,9 @@
  * Basic message processing functionality.
  */
 
-require_once('model/context.php');
-require_once('lib.php');
-require_once('msg_processing_commands.php');
+require_once(dirname(__FILE__) . '/model/context.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/msg_processing_commands.php');
 
 /**
  * Attempts to switch to "quiz answering" mode, by quiz code.

@@ -7,9 +7,9 @@
  * Class wrapping the bot's context in this run.
  */
 
-require_once('lib.php');
+require_once(dirname(__FILE__) . '/../lib.php');
 
-require_once('incoming_message.php');
+require_once(dirname(__FILE__) . '/incoming_message.php');
 
 class Context {
 
