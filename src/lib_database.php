@@ -10,7 +10,23 @@
 require_once('lib_core_database.php');
 require_once('lib_utility.php');
 
-//RIDDLES
+// SESSIONS
+
+/**
+ * Gets current session.
+ */
+function get_current_session_id() {
+    return db_scalar_query("SELECT `id` FROM `session` ORDER BY `id` DESC LIMIT 1");
+}
+
+/**
+ * Opens a new session.
+ */
+function open_new_session($telegram_id) {
+    db_perform_action("INSERT INTO `session` VALUES(DEFAULT, CURRENT_DATE(), {$telegram_id})");
+}
+
+// RIDDLES
 
 /**
  * Returns a specific riddle as an array.
@@ -40,10 +56,10 @@ function get_riddle_by_code($riddle_code) {
  */
 function open_riddle($channel_message_id = NULL) {
     $salt = generate_random_salt();
-
+    $session_id = get_current_session_id();
     $channel_message_id_db = is_null($channel_message_id) ? 'NULL' : "'" . db_escape($channel_message_id) . "'";
 
-    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, DEFAULT, NULL, NULL, '{$salt}', {$channel_message_id_db}) ");
+    $riddle_id = db_perform_action("INSERT INTO `riddle` VALUES (DEFAULT, {$session_id}, DEFAULT, NULL, NULL, '{$salt}', {$channel_message_id_db})");
 
     return array($riddle_id, $salt);
 }
@@ -67,8 +83,8 @@ function get_riddle_qrcode_url($riddle_id) {
  * @return int|bool
  */
 function close_riddle($riddle_id, $text) {
-    if(is_riddle_closed($riddle_id)){
-        throw new ErrorException('Riddle already closed');
+    if(is_riddle_closed($riddle_id)) {
+        return;
     }
 
     $clean_text = db_escape(extract_response($text));
@@ -103,7 +119,7 @@ function is_riddle_closed($riddle_id) {
  * @param $channel_message_id
  * @return bool|int
  */
-function set_riddle_channel_message_id($riddle_id, $channel_message_id){
+function set_riddle_channel_message_id($riddle_id, $channel_message_id) {
     return db_perform_action("UPDATE `riddle` SET `channel_message_id` = {$channel_message_id} WHERE `riddle`.`id` = {$riddle_id}");
 }
 
@@ -117,7 +133,7 @@ function get_riddle_channel_message_id($riddle_id){
     return db_scalar_query("SELECT `channel_message_id` FROM `riddle` WHERE `riddle`.`id` = {$riddle_id}");
 }
 
-//ANSWERS
+// ANSWERS
 
 /**
  * Returns a specific answer identified by $telegram_id, $riddle_id, as an array.
@@ -263,7 +279,7 @@ function set_identity_answering_status($telegram_id, $riddle_id) {
     return change_identity_status($telegram_id, IDENTITY_STATUS_ANSWERING, $riddle_id);
 }
 
-//STATS
+// STATS
 
 /**
  * Get the correct answer percentage of a riddle.
@@ -304,22 +320,27 @@ function get_riddle_current_stats($riddle_id) {
  * @return array Array of correct answers, ordered by timestamp, as
  *               Telegram ID, name, participant count.
  */
-function get_riddle_topten($riddle_id) {
+function get_riddle_topten($riddle_id, $count = 3) {
     if(!is_riddle_closed($riddle_id)){
         throw new ErrorException('Riddle still open');
     }
 
-    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` ), `identity`.`participants_count` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT 3");
+    return db_table_query("SELECT `answer`.`telegram_id` as telegram_id, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name` ), `identity`.`participants_count` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` LEFT JOIN `identity` ON `answer`.`telegram_id` = `identity`.`telegram_id` WHERE `riddle`.`id` = {$riddle_id} AND `riddle`.`answer` = `answer`.`text` AND `riddle`.`answer` IS NOT NULL ORDER BY `answer`.`last_update` ASC LIMIT {$count}");
 }
 
 
 /**
- * Returns the overall topten of users as an array of (row) array where each row is composed by (number of right answers,user's name)
+ * Returns the overall topten of users as a list of tuples, composed of the
+ * number of right answers and the user's name.
  *
- * @return array|bool
+ * @return array
  */
-function get_general_topten() {
-    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `answer`.`text` = `riddle`.`answer` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT 10");
+function get_general_topten($session_id = null, $count = 10) {
+    if($session_id == null) {
+        $session_id = get_current_session_id();
+    }
+
+    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT {$count}");
 }
 
 /**
@@ -327,11 +348,15 @@ function get_general_topten() {
  *
  * @return array
  */
-function get_general_topten_in_time() {
-    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT 10");
+function get_general_topten_in_time($session_id = null, $count = 10) {
+    if($session_id == null) {
+        $session_id = get_current_session_id();
+    }
+
+    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT {$count}");
 }
 
-//DB
+// DB
 
 /**
  * Completely wipes out the DB data.
@@ -345,4 +370,3 @@ function reset_db() {
     db_perform_action("ALTER TABLE `riddle` AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");
 }
-
