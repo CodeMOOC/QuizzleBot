@@ -16,7 +16,7 @@ function process_command($context, $text) {
 
     if($command === 'new') {
         if(!$context->is_abmin()) {
-            $context->reply(QUIZ_NOT_ADMIN);
+            $context->reply(GENERIC_NOT_ADMIN);
             return true;
         }
 
@@ -46,6 +46,18 @@ function process_command($context, $text) {
         else {
             $context->reply(QUIZ_ALREADY_OPEN);
         }
+
+        return true;
+    }
+    else if($command === 'session') {
+        if(!$context->is_abmin()) {
+            $context->reply(GENERIC_NOT_ADMIN);
+            return true;
+        }
+
+        change_identity_status($context->get_telegram_user_id(), IDENTITY_STATUS_NEW_SESSION);
+
+        $context->confirm(SESSION_NEW_ASK);
 
         return true;
     }

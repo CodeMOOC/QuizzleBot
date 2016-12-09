@@ -9,7 +9,9 @@
 
 const QUIZ_CREATED_OK = "Nuovo quiz attivo. Codice: ";
 const QUIZ_ALREADY_OPEN = "Quiz già attivo: all'invio della risposta corretta il quiz corrente viene chiuso e le risposte vengono consegnate.";
-const QUIZ_NOT_ADMIN = "Non sei registrato come amministratore, spiacente. 😞";
+
+const SESSION_NEW_ASK = "Stai per generare una nuova sessione di gioco. Vuoi continuare?";
+const SESSION_NEW_CONFIRM = "Ok, nuova sessione di gioco attiva. Le statistiche di gioco faranno riferimento alla session in atto.";
 
 const COMMAND_HELP = "Ciao, sono <b>Quizzle</b>, un bot che gestisce dei quiz multiutente. Puoi registrarti come gruppo col comando /register. Se ci sono quiz attivi, avrai ricevuto un codice o un <i>QR Code</i> che puoi utilizzare per rispondere. Ti informerò delle risposte corrette e dei risultati.\n\nIl mio codice è <a href=\"https://github.com/CodeMOOC/QuizzleBot\">disponibile su Github</a>.";
 
@@ -40,6 +42,6 @@ const CHANNEL_NEW_RIDDLE = "📢 Nuovo quesito! <a href=\"" . TELEGRAM_DEEP_LINK
 const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b> (👥 Partecipanti: <b>%TOTAL_PARTICIPANTS%</b>)\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
 const CHANNEL_CORRECT_ANSWER = "La risposta corretta era “%ANSWER%”. ✅";
 
-const COMMAND_UNKNOWN = "Comando non riconosciuto.";
-
-const MESSAGE_NOT_SUPPORTED = "Eh? Usa il comando /help per avere informazioni.";
+const GENERIC_NOT_SUPPORTED = "Eh? Usa il comando /help per avere informazioni.";
+const GENERIC_NOT_ADMIN = "Non sei registrato come amministratore, questo comando non è disponibile. Spiacente. 😞";
+const GENERIC_NEVERMIND = "No problem.";

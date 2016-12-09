@@ -87,6 +87,20 @@ function process_status($context, $text) {
                 $context->reply(REGISTER_QUERY_OK);
             }
             return true;
+
+        case IDENTITY_STATUS_NEW_SESSION:
+            if(in_array(extract_response($text), REGISTER_AFFIRMATIVE)) {
+                open_new_session($context->get_telegram_user_id());
+
+                $context->reply(SESSION_NEW_CONFIRM);
+            }
+            else {
+                $context->reply(GENERIC_NEVERMIND);
+            }
+
+            set_identity_default_status($context->get_telegram_user_id());
+
+            return true;
     }
 
     return false;
@@ -187,7 +201,7 @@ function process_message($context) {
             process_text_message($context, $context->get_message()->text);
         }
         else {
-            $context->reply(MESSAGE_NOT_SUPPORTED);
+            $context->reply(GENERIC_NOT_SUPPORTED);
         }
     }
     else {
