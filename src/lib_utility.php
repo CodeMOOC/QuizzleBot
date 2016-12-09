@@ -100,8 +100,7 @@ function escape_markdown($text) {
 /**
  * Escapes accents.
  */
-function escape_accents($text)
-{
+function escape_accents($text) {
     return preg_replace('~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml|caron);~i', '$1', htmlentities($text, ENT_QUOTES, 'UTF-8'));
 }
 
@@ -114,11 +113,19 @@ function is_guid($text) {
     return preg_match('/^\{?[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\}?$/', $text) > 0;
 }
 
+/**
+ * Generate URL code for a Google-generated image of a deep-link QRCode.
+ */
 function generate_qr_code_url($code) {
     $deeplink_base_url = rawurlencode(TELEGRAM_DEEP_LINK_URI_BASE);
 
     return "https://chart.googleapis.com/chart?chs=500x500&cht=qr&chl=$deeplink_base_url$code&choe=UTF-8";
 }
 
-
-?>
+/**
+ * Returns a random alphanumeric string 3-characters long
+ * @return string
+ */
+function generate_random_salt() {
+    return mb_strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2));
+}

@@ -243,15 +243,6 @@ function db_escape($s) {
     return mysqli_real_escape_string(db_open_connection(true), (string)$s);
 }
 
-
-/**
- * Returns a random alphanumeric string 3-characters long
- * @return string
- */
-function generate_random_salt() {
-    return mb_strtoupper(substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 2));
-}
-
 const RIDDLE_ID                 = 0;
 const RIDDLE_SESSION_ID         = 1;
 const RIDDLE_START_TIME         = 2;
