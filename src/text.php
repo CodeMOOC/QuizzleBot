@@ -28,6 +28,7 @@ const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const RESET_OK = "Tutto dimenticato.";
 
+const REGISTER_WELCOME = "Ciao, sono <b>Quizzle</b>, un bot che gestisce dei quiz multiutente.";
 const REGISTER_QUERY_CONFIRM = "Vuoi che ti registri come gruppo?";
 const REGISTER_AFFIRMATIVE = array('si', 'sì', 'ok', 'certo', 'va bene', 'bene');
 const REGISTER_QUERY_NAME = "Ok, %FIRST_NAME%. Qual è il nome del tuo gruppo?";
