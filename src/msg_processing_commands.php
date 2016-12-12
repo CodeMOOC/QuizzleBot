@@ -85,11 +85,16 @@ function process_command($context, $text) {
         return true;
     }
     else if($command === 'start' && !$context->is_abmin()) {
-        // User wants to answer riddle
+        // User might want to answer riddle
         $payload = extract_command_payload($text);
         Logger::debug("Start payload '{$payload}'", __FILE__, $context);
 
-        switch_to_riddle($context, $payload);
+        if($payload) {
+            switch_to_riddle($context, $payload);
+        }
+        else {
+            $context->reply(COMMAND_HELP);
+        }
 
         return true;
     }
