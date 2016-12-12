@@ -20,6 +20,20 @@ function get_current_session_id() {
 }
 
 /**
+ * Gets session information.
+ */
+function get_session($session_id) {
+    return db_row_query("SELECT * FROM `session` WHERE `id` = {$session_id}");
+}
+
+/**
+ * Gets session info (ID, creation date, creator full name).
+ */
+function get_session_info($session_id) {
+    return db_row_query("SELECT s.`id`, s.`creation_date`, i.`full_name` FROM `session` AS s LEFT OUTER JOIN `identity` AS i ON s.`telegram_id` = i.`telegram_id` WHERE s.`id` = {$session_id}");
+}
+
+/**
  * Opens a new session.
  */
 function open_new_session($telegram_id) {
@@ -246,7 +260,6 @@ function change_identity_status($telegram_id, $status = IDENTITY_STATUS_DEFAULT,
     return db_perform_action("UPDATE `identity` SET `status` = {$status}, `riddle_id`  = {$riddle_id_db} WHERE `identity`.`telegram_id` = {$telegram_id}");
 }
 
-
 /**
  * Sets the participants count
  *
@@ -257,7 +270,6 @@ function change_identity_status($telegram_id, $status = IDENTITY_STATUS_DEFAULT,
 function set_identity_participants_count($telegram_id, $count = 1){
     return db_perform_action("UPDATE `identity` SET `participants_count` = {$count} WHERE `identity`.`telegram_id` = {$telegram_id}");
 }
-
 
 /**
  * Sets the identity status to DEFAULT (0)
@@ -330,30 +342,38 @@ function get_riddle_topten($riddle_id, $count = 3) {
 
 
 /**
- * Returns the overall topten of users as a list of tuples, composed of the
- * number of right answers and the user's name.
- *
- * @return array
- */
-function get_general_topten($session_id = null, $count = 10) {
-    if($session_id == null) {
-        $session_id = get_current_session_id();
-    }
-
-    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT {$count}");
-}
-
-/**
- * The same as @see get_general_topten() but only considers the answers given before the riddle has ended.
- *
- * @return array
+ * Returns the overall top ten of users that answered correctly and in time.
+ * Results contain: number of correct answers, cumulative delay, identity.
  */
 function get_general_topten_in_time($session_id = null, $count = 10) {
     if($session_id == null) {
         $session_id = get_current_session_id();
     }
 
-    return db_table_query("SELECT `v`.`success`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `success` DESC LIMIT {$count}");
+    return db_table_query("SELECT `v`.`success`, `v`.`cum_delay`, IF(`identity`.`group_name` IS NULL, `identity`.`full_name`, `identity`.`group_name`) name FROM (SELECT COUNT(*) success, SUM(TIMESTAMPDIFF(SECOND, `riddle`.`start_time`, `answer`.`last_update`)) AS cum_delay, `telegram_id` FROM `answer` LEFT JOIN `riddle` ON `answer`.`riddle_id` = `riddle`.`id` WHERE `riddle`.`session_id` = {$session_id} AND `answer`.`text` = `riddle`.`answer` AND `answer`.`last_update` < `riddle`.`end_time` GROUP BY `telegram_id`) v LEFT JOIN `identity` ON `v`.`telegram_id` = `identity`.`telegram_id` ORDER BY `v`.`success` DESC, `v`.`cum_delay` ASC LIMIT {$count}");
+}
+
+/**
+ * Get the average number of received answers in a session.
+ */
+function get_average_answers_for_session($session_id = null) {
+    if($session_id == null) {
+        $session_id = get_current_session_id();
+    }
+
+    return db_scalar_query("SELECT AVG(`answers`) FROM (SELECT COUNT(`answer`.`telegram_id`) AS `answers` FROM `riddle` LEFT JOIN `answer` ON `riddle`.id = `answer`.`riddle_id` WHERE `session_id` = {$session_id} GROUP BY `riddle`.`id`) AS t1");
+}
+
+/**
+ * Get full answers stats of a session.
+ * Result rows contain (ID, code, # answers, # correct answers, # participants).
+ */
+function get_answers_stats($session_id = null) {
+    if($session_id == null) {
+        $session_id = get_current_session_id();
+    }
+
+    return db_table_query("SELECT riddle.id, CONCAT(riddle.salt, riddle.id) AS code, COUNT(*) AS answers, SUM(IF(answer.text = riddle.answer, 1, 0)) AS correct, SUM(identity.participants_count) AS participants FROM identity LEFT JOIN answer ON answer.telegram_id = identity.telegram_id LEFT JOIN riddle ON answer.riddle_id = riddle.id WHERE riddle.session_id = {$session_id} GROUP BY riddle.id");
 }
 
 /**

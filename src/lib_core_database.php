@@ -243,6 +243,10 @@ function db_escape($s) {
     return mysqli_real_escape_string(db_open_connection(true), (string)$s);
 }
 
+const SESSION_ID                = 0;
+const SESSION_START_DATE        = 1;
+const SESSION_CREATOR_ID        = 2;
+
 const RIDDLE_ID                 = 0;
 const RIDDLE_SESSION_ID         = 1;
 const RIDDLE_START_TIME         = 2;

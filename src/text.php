@@ -44,6 +44,15 @@ const CHANNEL_NEW_RIDDLE_UPDATE = " (Risposte ricevute: <b>%ANSWERS%</b>)";
 const CHANNEL_FINAL = "🏁 <b>Quesito chiuso</b> (%CODE%)\nTotale risposte: <b>%TOTAL_COUNT%</b> (👥 Partecipanti: <b>%TOTAL_PARTICIPANTS%</b>)\nRisposte corrette: <b>%PERCENT_CORRECT%%</b>\n\n<b>Prime risposte corrette:</b>";
 const CHANNEL_CORRECT_ANSWER = "La risposta corretta era “%ANSWER%”. ✅";
 
+const STATS_SESSION = "Sessione corrente: <b>#%SESSION%</b>.\nCreata il %START_DATE% da %CREATOR%.";
+const STATS_TOPTEN_START = "🏆 <b>Classifica generale:</b>\n";
+const STATS_TOPTEN_ICON_1 = "🥇";
+const STATS_TOPTEN_ICON_2 = "🥈";
+const STATS_TOPTEN_ICON_3 = "🥉";
+const STATS_TOPTEN_ICON_OTHER = "💐";
+const STATS_TOPTEN_ROW = " %ANSWERS% <b>%NAME%</b> (%DELAY% secondi)";
+const STATS_TOPTEN_ENDING = "\n\n(⏲ I valori in secondi indicano la somma dei tempi tra l'annuncio della domanda e la risposta fornita.)";
+
 const GENERIC_NOT_SUPPORTED = "Eh? Usa il comando /help per avere informazioni.";
 const GENERIC_NOT_ADMIN = "Non sei registrato come amministratore, questo comando non è disponibile. Spiacente. 😞";
 const GENERIC_NEVERMIND = "No problem.";

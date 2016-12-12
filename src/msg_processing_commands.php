@@ -84,6 +84,40 @@ function process_command($context, $text) {
 
         return true;
     }
+    else if($command === 'stats') {
+        $session_info = get_session_info(get_current_session_id());
+        $creation_date = date('l, j F Y', strtotime($session_info[1]));
+        $context->reply(STATS_SESSION, array(
+            '%SESSION%' => intval($session_info[0]),
+            '%START_DATE%' => $creation_date,
+            '%CREATOR%' => $session_info[2]
+        ));
+
+        $stats = get_general_topten_in_time(intval($session_info[0]), 10);
+        $out = STATS_TOPTEN_START;
+        $i = 0;
+        foreach($stats as $s) {
+            $out .= "\n";
+            if($i == 0)
+                $out .= STATS_TOPTEN_ICON_1;
+            else if($i == 1)
+                $out .= STATS_TOPTEN_ICON_2;
+            else if($i == 2)
+                $out .= STATS_TOPTEN_ICON_3;
+            else
+                $out .= STATS_TOPTEN_ICON_OTHER;
+            $out .= hydrate(STATS_TOPTEN_ROW, array(
+                '%ANSWERS%' => intval($s[0]),
+                '%DELAY%' => intval($s[1]),
+                '%NAME%' => $s[2]
+            ));
+            $i++;
+        }
+        $out .= STATS_TOPTEN_ENDING;
+        $context->reply($out);
+
+        return true;
+    }
     else if($command === 'start' && !$context->is_abmin()) {
         // User might want to answer riddle
         $payload = extract_command_payload($text);
