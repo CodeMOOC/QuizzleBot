@@ -1,0 +1,2 @@
+# Per-riddle stats with total and correct answers
+SELECT `riddle`.`id`, SUM(IF(`answer`.`text` = `riddle`.`answer`, 1, 0)) AS `correct_count`, count(*) AS `total_count`, (SUM(IF(`answer`.`text` = `riddle`.`answer`, 1, 0)) / count(*)) * 100 AS `percent`, `riddle`.`answer` FROM `riddle` LEFT OUTER JOIN `answer` ON `riddle`.`id` = `answer`.`riddle_id` WHERE `riddle`.`session_id` = 3 GROUP BY `riddle`.`id` ORDER BY `riddle`.`id` ASC;
