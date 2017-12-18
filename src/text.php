@@ -27,6 +27,7 @@ const START_ALREADY_ANSWERED = "Hai già risposto a questo quesito (la tua prima
 const START_RECOGNIZED = "Scrivi qui la tua risposta al quesito.";
 
 const RESET_OK = "Tutto dimenticato.";
+const RESET_DISABLED = "Comando /reset disabilitato per amministratori.";
 
 const REGISTER_WELCOME = "Ciao, sono <b>Quizzle</b>, un bot che gestisce dei quiz multiutente.";
 const REGISTER_QUERY_CONFIRM = "Vuoi che ti registri come gruppo?";

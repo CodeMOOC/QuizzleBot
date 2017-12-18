@@ -61,10 +61,15 @@ function process_command($context, $text) {
 
         return true;
     }
-    else if($command === 'reset' && $context->is_abmin()) {
-        reset_db();
-
-        $context->reply(RESET_OK);
+    else if($command === 'reset') {
+        if($context->is_abmin()) {
+            // reset_db();
+            $context->reply(RESET_DISABLED);
+        }
+        else {
+            reset_conversation($context->get_telegram_user_id());
+            $context->reply(RESET_OK);
+        }
 
         return true;
     }

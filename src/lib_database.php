@@ -398,3 +398,13 @@ function reset_db() {
     db_perform_action("ALTER TABLE `riddle` AUTO_INCREMENT = 1");
     db_perform_action("COMMIT");
 }
+
+/**
+ * Completely wipes out track of a user's conversation.
+ */
+function reset_conversation($telegram_id) {
+    db_perform_action("START TRANSACTION");
+    db_perform_action("DELETE FROM `answer` WHERE `telegram_id` = {$telegram_id}");
+    db_perform_action("DELETE FROM `identity` WHERE `telegram_id` = {$telegram_id}");
+    db_perform_action("COMMIT");
+}
